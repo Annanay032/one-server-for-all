@@ -48,7 +48,7 @@ Object.keys(db).forEach(modelName => {
 });
 
 sequelize.sync().then(() => {
-    console.log('sssssssssssssssss3333333333')
+    console.log('sssssssssssssssss33333333334')
   }).catch(err => {
   logger.error(err);
 });
