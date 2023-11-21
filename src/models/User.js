@@ -3,19 +3,17 @@ export default function (sequelize, DataTypes) {
     name: {
       type: DataTypes.STRING,
     },
-    id: {
+    reference: {
+      type: DataTypes.STRING,
+    },
+    address: {
+      type: DataTypes.STRING,
+    },
+    customerId: {
       type: DataTypes.INTEGER,
-      primaryKey: true, // Mark 'id' as the primary key
     },
   });
 
-  console.log('jhgfdsdasa', User)
-  User.sync({alter: true}).then(() => {
-      console.log('sssssssssssssssss')
-    }).catch((err) => {
-      console.log('errsssssssssssssssss', err)
-    
-    })
+  User.sync({ alter: true });
   return User;
-
 }

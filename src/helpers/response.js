@@ -2,7 +2,7 @@ import logger from '../logger.js';
 
 const responseHelper = {};
 
-responseHelper.optionsSuccess = (res) => {
+responseHelper.optionsSuccess = res => {
   res.status(204).send();
 };
 

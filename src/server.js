@@ -2,7 +2,9 @@ import http from 'http';
 import app from './app.js';
 import config from './config.js';
 import logger from './logger.js';
+import exportObj from './socket.js';
 
+const { websockets} = exportObj;
 const normalizePort = (val) => {
   const port = parseInt(val, 10);
   if (Number.isNaN(+val)) {
@@ -20,7 +22,8 @@ const env = process.env.NODE_ENV || 'development';
 app.set('port', port);
 
 const server = http.createServer(app);
-logger.info(`***** START | Env: ${env} *****`);
+logger.info(`***** START | Env: ${env} *****e`);
+websockets(server);
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -48,6 +51,12 @@ function onListening() {
   const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
   logger.info(`Listening on ${bind}`);
 }
+
+// // Socket.IO event handling
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
+//   // Add your Socket.IO event handlers here
+// });
 
 server.listen(port);
 server.on('error', onError);
