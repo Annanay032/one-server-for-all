@@ -12,6 +12,18 @@ export default function (sequelize, DataTypes) {
     customerId: {
       type: DataTypes.INTEGER,
     },
+    email: {
+      type: DataTypes.STRING,
+    },
+    status: {
+      type: DataTypes.STRING,
+    },
+    role: {
+      type: DataTypes.STRING,
+    },
+    team: {
+      type: DataTypes.STRING,
+    },
   });
 
   User.sync({ alter: true });
