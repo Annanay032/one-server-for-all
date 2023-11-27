@@ -15,9 +15,15 @@ class BaseController {
   }
 
   create(values, options = {}) {
-    _set(values, 'customerId', this.customerId);
-    _set(options, 'individualHooks', this.individualHooks);
-    return this.model.create(values, options);
+    // _set(values, 'customerId', this.customerId);
+    // _set(options, 'individualHooks', this.individualHooks);
+    return this.model.create(values);
+  }
+
+  delete(options = {}) {
+    // _set(values, 'customerId', this.customerId);
+    // _set(options, 'individualHooks', this.individualHooks);
+    return this.model.destroy(options);
   }
 
   bulkCreate(records, options = {}) {
@@ -38,7 +44,7 @@ class BaseController {
     const options = {
       where: {
         id,
-        customerId: this.customerId,
+        // customerId: this.customerId,
       },
     };
     return this.model.findOne(options);
@@ -120,11 +126,11 @@ class BaseController {
   }
 
   update(values, options = {}) {
-    if (values.customerId) {
-      throw new Error('cappController - Invalid customer ID update');
-    }
-    _set(options, 'where.customerId', this.customerId);
-    _set(options, 'individualHooks', this.individualHooks);
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
+    // _set(options, 'where.customerId', this.customerId);
+    // _set(options, 'individualHooks', this.individualHooks);
     return this.model.update(values, options);
   }
 
@@ -135,15 +141,15 @@ class BaseController {
   }
 
   updateById(values, id) {
-    if (values.customerId) {
-      throw new Error('cappController - Invalid customer ID update');
-    }
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
     const options = {
       where: {
         id,
-        customerId: this.customerId,
+        // customerId: this.customerId,
       },
-      individualHooks: this.individualHooks,
+      // individualHooks: this.individualHooks,
     };
     return this.model.update(values, options);
   }

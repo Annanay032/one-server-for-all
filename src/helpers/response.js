@@ -20,7 +20,11 @@ responseHelper.success = (res, data = null, meta = null) => {
 };
 
 // for conversation bot
-responseHelper.successForConversationChatBot = (res, data = null, meta = null) => {
+responseHelper.successForConversationChatBot = (
+  res,
+  data = null,
+  meta = null,
+) => {
   const ret = {
     success: 1,
   };
@@ -41,6 +45,18 @@ responseHelper.error = (res, err = null) => {
   if (err) {
     logger.error(err);
     ret.reason = err.message;
+  }
+  res.status((err && err.httpStatus) || 500).json(ret);
+};
+
+responseHelper.notFound = (res, err = null) => {
+  const ret = {
+    success: 0,
+    reason: err,
+  };
+  if (err) {
+    logger.error(err);
+    ret.reason = err;
   }
   res.status((err && err.httpStatus) || 500).json(ret);
 };

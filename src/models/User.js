@@ -17,6 +17,7 @@ export default function (sequelize, DataTypes) {
     },
     status: {
       type: DataTypes.STRING,
+      defaultValue: 'active',
     },
     role: {
       type: DataTypes.STRING,

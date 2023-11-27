@@ -10,7 +10,7 @@ const __filename = new URL('', import.meta.url).pathname;
 
 const basename = path.basename(__filename);
 const __dirname = new URL('.', import.meta.url).pathname;
-console.log('fffff', __filename, __dirname, basename);
+// console.log('fffff', __filename, __dirname, basename);
 const db = {};
 const sequelize = new Sequelize(config.db.database, config.db.username, config.db.password, {
   host: config.db.host,
@@ -31,7 +31,7 @@ fs.readdirSync(__dirname).filter(file => (
 )).forEach(async file => {
   const module = await import(path.join(__dirname, file));
   const model = module.default(sequelize, DataTypes);
-  console.log('fffff33rrr3model', model, model.name);
+  // console.log('fffff33rrr3model', model, model.name);
   // model.sync().then(() => {
   //   console.log('sssssssssssssssss')
   // }).catch((err) => {
@@ -48,7 +48,7 @@ Object.keys(db).forEach(modelName => {
 });
 
 sequelize.sync().then(() => {
-    console.log('sssssssssssssssss33333333334')
+    // console.log('sssssssssssssssss33333333334')
   }).catch(err => {
   logger.error(err);
 });
@@ -56,7 +56,7 @@ sequelize.sync().then(() => {
 Sequelize.postgres.DECIMAL.parse = value => parseFloat(value);
 
 const { Op } = Sequelize;
-console.log('fffff33rrr3Sequelize', db, Sequelize);
+// console.log('fffff33rrr3Sequelize', db, Sequelize);
 
 export {
   db,
