@@ -1,5 +1,5 @@
-import { db, Op, sequelize } from "../models/index.js";
-import BaseController from "./baseController.js";
+import { db, Op, sequelize } from '../models/index.js';
+import BaseController from './baseController.js';
 
 class NotificationController extends BaseController {
   constructor() {

@@ -9,6 +9,14 @@ const config = {
   app: {
     env: process.env.NODE_ENV,
     port: process.env.PORT,
+    capp: {
+      auth: {
+        token: process.env.CAUTH_TOKEN,
+        domain: process.env.CAUTH_DOMAIN,
+        jwtSecret: process.env.CAUTH_JWT_SECRET,
+      },
+      url: process.env.CURL,
+    },
   },
   db: {
     username: process.env.DB_USERNAME,

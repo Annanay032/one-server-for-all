@@ -2,22 +2,26 @@ import _set from 'lodash/set.js';
 
 class BaseController {
   constructor(model, customerId = null, individualHooks = false) {
-    console.log('hgfdsds' , model)
+    console.log('hgfdsds', model);
     if (!model) {
-      throw new Error('cappController - Cannot initialize without model');
+      throw new Error('Base Controller - Cannot initialize without model');
     }
-    // if (!customerId) {
-    //   throw new Error('cappController - Cannot initialize without customer ID');
-    // }
+    if (!customerId) {
+      throw new Error(
+        'Base Controller - Cannot initialize without customer ID',
+      );
+    }
     this.customerId = customerId;
     this.model = model;
     this.individualHooks = individualHooks;
   }
 
   create(values, options = {}) {
-    // _set(values, 'customerId', this.customerId);
+    if (values.customerId) {
+      _set(values, 'customerId', this.customerId);
+    }
     // _set(options, 'individualHooks', this.individualHooks);
-    return this.model.create(values);
+    return this.model.create(values, options);
   }
 
   delete(options = {}) {
@@ -27,7 +31,7 @@ class BaseController {
   }
 
   bulkCreate(records, options = {}) {
-    const bulkCreateArray = records.map((record) => {
+    const bulkCreateArray = records.map(record => {
       _set(record, 'customerId', this.customerId);
       return record;
     });
@@ -44,7 +48,7 @@ class BaseController {
     const options = {
       where: {
         id,
-        // customerId: this.customerId,
+        customerId: this.customerId,
       },
     };
     return this.model.findOne(options);
@@ -77,7 +81,11 @@ class BaseController {
     // Pagination options processing
     let queryLimit = 20;
     let queryOffset = 0;
-    if (paginationOptions.limit && paginationOptions.limit > 0 && paginationOptions.limit <= 100) {
+    if (
+      paginationOptions.limit
+      && paginationOptions.limit > 0
+      && paginationOptions.limit <= 100
+    ) {
       queryLimit = paginationOptions.limit;
     }
     if (paginationOptions.page && paginationOptions.page > 1) {
@@ -109,7 +117,11 @@ class BaseController {
     // Pagination options processing
     let queryLimit = 20;
     let queryOffset = 0;
-    if (paginationOptions.limit && paginationOptions.limit > 0 && paginationOptions.limit <= 100) {
+    if (
+      paginationOptions.limit
+      && paginationOptions.limit > 0
+      && paginationOptions.limit <= 100
+    ) {
       queryLimit = paginationOptions.limit;
     }
     if (paginationOptions.page && paginationOptions.page > 1) {
@@ -126,10 +138,10 @@ class BaseController {
   }
 
   update(values, options = {}) {
-    // if (values.customerId) {
-    //   throw new Error('cappController - Invalid customer ID update');
-    // }
-    // _set(options, 'where.customerId', this.customerId);
+    if (!values.customerId) {
+      throw new Error('Base Controller - Invalid customer ID update');
+    }
+    _set(options, 'where.customerId', this.customerId);
     // _set(options, 'individualHooks', this.individualHooks);
     return this.model.update(values, options);
   }
@@ -141,13 +153,13 @@ class BaseController {
   }
 
   updateById(values, id) {
-    // if (values.customerId) {
-    //   throw new Error('cappController - Invalid customer ID update');
-    // }
+    if (values.customerId) {
+      throw new Error('cappController - Invalid customer ID update');
+    }
     const options = {
       where: {
         id,
-        // customerId: this.customerId,
+        customerId: this.customerId,
       },
       // individualHooks: this.individualHooks,
     };

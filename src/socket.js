@@ -52,7 +52,7 @@ const websockets = server => {
     pingInterval: 5000,
     upgradeTimeout: 30000,
     cors: {
-      origin: 'http://localhost:2000',
+      origin: 'http://localhost:3000',
     },
   });
   io.on('connection', socket => {

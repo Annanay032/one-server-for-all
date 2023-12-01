@@ -1,0 +1,50 @@
+ALTER TABLE "Users"
+ADD COLUMN "managerId" INTEGER,
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "roleId" INTEGER,
+ADD COLUMN "uniqueUserId" INTEGER;
+
+
+ALTER TABLE "Addresses"
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "userId" INTEGER NOT NULL,
+ADD COLUMN "defaultBillingAddressId" INTEGER;
+
+ALTER TABLE "BillingAddressMappings"
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "billingAddressId" INTEGER,
+ADD COLUMN "addressId" INTEGER;
+
+
+ALTER TABLE "Companies"
+ADD COLUMN "customerId" INTEGER NOT NULL;
+
+ALTER TABLE "CompanyAddressMappings"
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "companyId" INTEGER NOT NULL,
+ADD COLUMN "addressId" INTEGER NOT NULL;
+
+
+ALTER TABLE "Customers"
+ADD COLUMN "registeredAddressId" INTEGER,
+ADD COLUMN "primaryCompanyId" INTEGER;
+
+ALTER TABLE "Notifications"
+ADD COLUMN "userId" INTEGER NOT NULL;
+
+ALTER TABLE "Roles"
+ADD COLUMN "customerId" INTEGER NOT NULL;
+
+ALTER TABLE "UniqueUsers"
+ADD COLUMN "defaultUserId" INTEGER;
+
+
+ALTER TABLE "UserAddressMappings"
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "userId" INTEGER NOT NULL,
+ADD COLUMN "addressId" INTEGER;
+
+ALTER TABLE "UserCaches"
+ADD COLUMN "customerId" INTEGER NOT NULL,
+ADD COLUMN "userId" INTEGER NOT NULL;
+

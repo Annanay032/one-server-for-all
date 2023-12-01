@@ -10,6 +10,7 @@ responseHelper.success = (res, data = null, meta = null) => {
   const ret = {
     success: 1,
   };
+  console.log('rrrrrrrrrrrrrrrrrrrrr', data)
   if (data || data === 0) {
     ret.data = data;
   }

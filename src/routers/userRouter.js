@@ -5,6 +5,8 @@ import responseHelper from '../helpers/response.js';
 const router = Router();
 
 router.get('/', (req, res, next) => {
+  console.log('jhgfdssasasa', req)
+
   const options = req.query;
   return userService
     .findAllForListing(options)
@@ -29,6 +31,8 @@ router.post('/', (req, res, next) => {
 });
 
 router.post('/:userId/edit', (req, res, next) => {
+  console.log('jhgfdssasasa', req)
+
   const { userId } = req.params;
   const values = req.body;
   console.log('ereqwreewrew44444444444444444', userId, values);

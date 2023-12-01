@@ -18,9 +18,9 @@ export default function (sequelize, DataTypes) {
       code: {
         type: DataTypes.STRING,
       },
-      userId: {
-        type: DataTypes.INTEGER,
-      },
+      // userId: {
+      //   type: DataTypes.INTEGER,
+      // },
     },
     {},
   );
@@ -31,7 +31,7 @@ export default function (sequelize, DataTypes) {
     });
   };
 
-  Notification.sync({ alter: true });
+  // Notification.sync();
 
   return Notification;
 }

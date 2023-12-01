@@ -6,10 +6,7 @@ export default function (sequelize, DataTypes) {
     reference: {
       type: DataTypes.STRING,
     },
-    address: {
-      type: DataTypes.STRING,
-    },
-    customerId: {
+    addressId: {
       type: DataTypes.INTEGER,
     },
     email: {
@@ -21,12 +18,65 @@ export default function (sequelize, DataTypes) {
     },
     role: {
       type: DataTypes.STRING,
+      defaultValue: 'admin',
     },
     team: {
       type: DataTypes.STRING,
+      defaultValue: 'owner',
     },
+    uniqueIdentifier: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      // allowNull: false,
+    },
+    active: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      // allowNull: false,
+    },
+    // managerId: {
+    //   type: DataTypes.INTEGER,
+    // },
+    // customerId: {
+    //   type: DataTypes.INTEGER,
+    //   allowNull: false,
+    // },
+    // roleId: {
+    //   type: DataTypes.INTEGER,
+    // },
+    // uniqueUserId: {
+    //   type: DataTypes.INTEGER,
+    // },
   });
 
-  User.sync({ alter: true });
+  User.associate = models => {
+    User.belongsTo(models.User, {
+      foreignKey: {
+        fieldName: 'managerId',
+      },
+      as: 'Manager',
+    });
+    User.hasMany(models.UserAddressMapping, {
+      foreignKey: 'userId',
+      as: 'UAMs',
+    });
+    User.belongsTo(models.Customer, {
+      foreignKey: {
+        fieldName: 'customerId',
+        constraints: false,
+      },
+    });
+    User.belongsTo(models.Role, {
+      foreignKey: {
+        fieldName: 'roleId',
+        allowNull: false,
+      },
+    });
+    User.belongsTo(models.UniqueUser, {
+      foreignKey: 'uniqueUserId',
+    });
+  };
+
+  // User.sync();
   return User;
 }
