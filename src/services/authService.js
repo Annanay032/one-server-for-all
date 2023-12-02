@@ -230,7 +230,7 @@ authService.resetPassword = async (values, resetToken) => {
 authService.authenticate = async (req, res, next) => {
   // const transaction = sequelize.transaction();
   if (env === 'development') {
-    _set(req, 'cappAuth', {
+    _set(req, 'appAuth', {
       // transaction,
       customerId: 1,
       userId: 1,
@@ -299,7 +299,7 @@ authService.authenticate = async (req, res, next) => {
         code: currentUser.Customer.code,
       },
     };
-    req.cappAuth = auth;
+    req.appAuth = auth;
     next();
   });
 };
