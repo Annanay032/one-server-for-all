@@ -3,37 +3,33 @@ import NotificationController from '../controllers/notificationController.js';
 
 const userService = {};
 
-userService.findAllForListing = async options => {
-  const userController = new UserController();
+userService.findAllForListing = async (options, auth) => {
+  const userController = new UserController(auth.customerId);
   const [usersData] = await Promise.all([
-    userController.findAllForListing(options),
+    userController.findAllForListing(options, auth.customerId),
   ]);
   return {
     data: usersData,
   };
 };
 
-userService.findOneById = async options => {
-  const userController = new UserController();
-  const userData = await userController.findOneById(options);
+userService.findOneById = async (id, auth) => {
+  const userController = new UserController(auth.customerId);
+  const userData = await userController.findOneById(id);
   return {
-    data: userData,
+    data: userData || {},
   };
 };
 
-userService.create = async values => {
-  const userController = new UserController();
-  // const [userData] = await Promise.all([
-  //   userController.create(values),
-  // ]);
-  console.log('values', values);
+userService.create = async (values, auth) => {
+  const userController = new UserController(auth.customerId);
   const user = await userController.create(values);
   return user;
 };
 
-userService.edit = async (values, userId) => {
-  const userController = new UserController();
-  const notificationController = new NotificationController();
+userService.edit = async (values, userId, auth) => {
+  const userController = new UserController(auth.customerId);
+  const notificationController = new NotificationController(auth.customerId);
 
   // const [userData] = await Promise.all([
   //   userController.create(values),
@@ -56,9 +52,9 @@ userService.edit = async (values, userId) => {
   return user;
 };
 
-userService.deleteById = async id => {
-  const userController = new UserController();
-  const notificationController = new NotificationController();
+userService.deleteById = async (id, auth) => {
+  const userController = new UserController(auth.customerId);
+  const notificationController = new NotificationController(auth.customerId);
 
   const options = {
     where: {

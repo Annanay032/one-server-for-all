@@ -1,4 +1,17 @@
-import utils from '../helpers/utils.js';
+// import utils from '../helpers/utils.js';
+import slug from 'slug';
+
+const slugify = val => {
+  if (val === null) {
+    return null;
+  }
+  return (
+    slug(val, {
+      lower: true,
+      remove: null,
+    }) || val
+  );
+};
 
 export default function (sequelize, DataTypes) {
   const Role = sequelize.define('Role', {
@@ -20,11 +33,15 @@ export default function (sequelize, DataTypes) {
     },
     admin: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
+      defaultValue: 1,
     },
     active: {
       type: DataTypes.INTEGER,
       defaultValue: 1,
+    },
+    status: {
+      type: DataTypes.STRING,
+      defaultValue: 'active',
     },
     // customerId: {
     //   type: DataTypes.INTEGER,
@@ -32,14 +49,14 @@ export default function (sequelize, DataTypes) {
     // },
   }, {
     hooks: {
-      beforeSave: (attributes) => {
-        attributes.set('slug', utils.slugify(attributes.get('name')));
+      beforeSave: attributes => {
+        attributes.set('slug', slugify(attributes.get('name')));
         // attributes.set('name', utils.slugify('admin'));
       },
     },
   });
 
-  Role.associate = (models) => {
+  Role.associate = models => {
     Role.belongsTo(models.Customer, {
       foreignKey: 'customerId',
       allowNull: false,

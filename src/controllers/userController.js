@@ -7,11 +7,15 @@ class UserController extends BaseController {
     this.sequelize = sequelize;
   }
 
-  findAllForListing(options = {}) {
+  findAllForListing(options = {}, customerId) {
     console.log('asasassasa', db);
     console.log('asasassasa2222222222', db);
-
-    return super.findAll();
+    const filter = {
+      where: {
+        customerId,
+      },
+    };
+    return super.findAll(filter);
   }
 
   findOneByIdForView(userId) {

@@ -11,9 +11,9 @@ class RoleController extends BaseController {
       where: {
         active: 1,
       },
-      order: [
-        ['rolehierarchy', 'ASC'],
-      ],
+      // order: [
+      //   ['rolehierarchy', 'ASC'],
+      // ],
     };
     if (options.query) {
       filter.where.name = {
@@ -38,15 +38,25 @@ class RoleController extends BaseController {
         active: 1,
       },
       attributes: ['id', 'name'],
-      order: [
-        ['rolehierarchy', 'ASC'],
-      ],
+      // order: [
+      //   ['rolehierarchy', 'ASC'],
+      // ],
     };
     if (options.query) {
       filter.where.name = {
         [Op.iLike]: `%${options.query}%`,
       };
     }
+    return super.findAll(filter);
+  }
+
+  findAllForOptions() {
+    const filter = {
+      where: {
+        active: 1,
+      },
+      attributes: [['id', 'value'], ['name', 'label']],
+    };
     return super.findAll(filter);
   }
 

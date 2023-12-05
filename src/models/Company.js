@@ -1,5 +1,17 @@
-import utils from '../helpers/utils.js';
+// import utils from '../helpers/utils.js';
+import slug from 'slug';
 
+const slugify = val => {
+  if (val === null) {
+    return null;
+  }
+  return (
+    slug(val, {
+      lower: true,
+      remove: null,
+    }) || val
+  );
+};
 export default function (sequelize, DataTypes) {
   const Company = sequelize.define('Company', {
     companyName: {
@@ -51,16 +63,16 @@ export default function (sequelize, DataTypes) {
     // },
   }, {
     hooks: {
-      beforeSave: (attributes) => {
-        attributes.set('slug', utils.slugify(attributes.get('companyName')));
-        attributes.set('codeSlug', utils.slugify(attributes.get('code')));
+      beforeSave: attributes => {
+        attributes.set('slug', slugify(attributes.get('companyName')));
+        attributes.set('codeSlug', slugify(attributes.get('code')));
       },
     },
   });
 
   // Company.sync();
 
-  Company.associate = (models) => {
+  Company.associate = models => {
     Company.belongsTo(models.Customer, {
       foreignKey: {
         fieldName: 'customerId',

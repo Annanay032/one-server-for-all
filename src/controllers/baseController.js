@@ -2,7 +2,7 @@ import _set from 'lodash/set.js';
 
 class BaseController {
   constructor(model, customerId = null, individualHooks = false) {
-    console.log('hgfdsds', model);
+    console.log('hgfdsds', model, customerId);
     if (!model) {
       throw new Error('Base Controller - Cannot initialize without model');
     }
@@ -45,6 +45,8 @@ class BaseController {
   }
 
   findOneById(id) {
+    console.log('hgfdsds33333333333333333333333333', this.customerId);
+
     const options = {
       where: {
         id,

@@ -1,0 +1,95 @@
+import BaseController from './baseController.js';
+import { db, Op } from '../models/index.js';
+
+class FieldController extends BaseController {
+  constructor(customerId, transaction) {
+    super(db.Field, customerId, { transaction });
+  }
+
+  findAllForListing(options) {
+    const filter = {
+      where: {
+        delete: 0,
+      },
+    };
+    const paginationOptions = {
+      limit: options.limit,
+      page: options.page,
+    };
+    return super.findAndCountAllWithPagination(filter, paginationOptions);
+  }
+
+  findOneByIdForView(fieldId) {
+    const filter = {
+      where: {
+        id: fieldId,
+      },
+    };
+    return super.findOne(filter);
+  }
+
+  findAllForSection(sectionId) {
+    const filter = {
+      where: {
+        sectionId,
+        delete: 0,
+        active: 1,
+      },
+      attributes: ['id', 'label', 'labelSlug'],
+    };
+    return super.findAll(filter);
+  }
+
+  bulkMarkInactiveById(fieldIds) {
+    return super.update({
+      active: 0,
+    }, {
+      where: {
+        id: fieldIds,
+      },
+    });
+  }
+
+  findAllByKeys(keys) {
+    const filter = {
+      where: {
+        key: keys,
+      },
+      attributes: ['id', 'key'],
+    };
+    return super.findAll(filter);
+  }
+
+  findAllBasedOnOptions(options = {}, attributes) {
+    const filter = {
+      where: options,
+      attributes,
+    };
+    return super.findAll(filter);
+  }
+
+  findAllByValidationType(formId, validationType) {
+    const filter = {
+      where: {
+        active: 1,
+        delete: 0,
+        validationType: {
+          [Op.contains]: validationType,
+        },
+      },
+      include: [{
+        model: db.Section,
+        where: {
+          active: 1,
+          delete: 0,
+          formId,
+        },
+        attributes: ['id'],
+      }],
+      attributes: ['id', 'validation', 'validationType', 'isOrgLevel', 'fieldKey', 'tableReference', 'label', 'labelSlug'],
+    };
+    return super.findAll(filter);
+  }
+}
+
+export default FieldController;

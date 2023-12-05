@@ -9,6 +9,7 @@ import userRouter from './routers/userRouter.js';
 import authRouter from './routers/authRouter.js';
 import authService from './services/authService.js';
 import notificationRouter from './routers/notificationRouter.js';
+import roleRouter from './routers/roleRouter.js';
 import responseHelper from './helpers/response.js';
 import { RouteNotFoundError } from './helpers/customError.js';
 
@@ -45,6 +46,7 @@ app.use('/*', authService.authenticate);
 app.use('/registration', registrationRouter);
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/roles', roleRouter);
 app.use('/notifications', notificationRouter);
 
 app.use((req, res, next) => {

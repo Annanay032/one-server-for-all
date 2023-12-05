@@ -21,6 +21,7 @@ import UniqueUserController from '../controllers/uniqueUserController.js';
 import BillingAddressMappingController from '../controllers/billingAddressMappingController.js';
 import CompanyAddressMappingController from '../controllers/companyAddressMappingController.js';
 import UserAddressMappingController from '../controllers/userAddressMappingController.js';
+import NotificationController from '../controllers/notificationController.js';
 
 const env = process.env.NODE_ENV || 'development';
 
@@ -36,24 +37,27 @@ registrationService.register = async values => {
   //   throw new ResourceNotFoundError();
   // }
   // if (!values.name || !values.password) {
-  //   throw new ValidationError('Email or password not present');
-  // }
-  const customerController = new CustomerController();
-  const addressController = new AddressController();
+    //   throw new ValidationError('Email or password not present');
+    // }
+    console.log('ddddddddddddddddddddddddddd', values);
 
-  const companyAddressMappingController = new CompanyAddressMappingController();
-  const userAddressMappingController = new UserAddressMappingController();
-  const billingAddressMappingController = new BillingAddressMappingController();
-  const uniqueUserController = new UniqueUserController();
-  const userController = new UserController();
-  const roleController = new RoleController();
-
-  const customer = await customerController.create(values);
-  const companyController = new CompanyController(customer.id);
-  console.log('ddddddddddddddddddddddddddd', customer.id);
-  if (!customer) {
+    const customerController = new CustomerController();
+    const customer = await customerController.create(values);
+    console.log('ddddddddddddddddddddddddddd', customer.id);
+    if (!customer) {
     throw new ResourceNotFoundError();
   }
+  const companyController = new CompanyController(customer.id);
+  const addressController = new AddressController(customer.id);
+  
+  const companyAddressMappingController = new CompanyAddressMappingController(customer.id);
+  const userAddressMappingController = new UserAddressMappingController(customer.id);
+  const billingAddressMappingController = new BillingAddressMappingController(customer.id);
+  const uniqueUserController = new UniqueUserController(customer.id);
+  const userController = new UserController(customer.id);
+  const roleController = new RoleController(customer.id);
+  const notificationController = new NotificationController(customer.id);
+
   const companyValues = { ...values, customerId: +customer.id };
   // _set(values, 'customerId', customer.id);
   console.log('companyValues',companyValues);
@@ -129,6 +133,20 @@ registrationService.register = async values => {
   }
 
   address = await addressController.updateById({ defaultBillingAddressId: billingAddressMapping.id }, address.id);
+
+
+  if (user) {
+    const values = {
+      type: 'Test2',
+      Text: 'Edited',
+      active: 1,
+      read: 0,
+      reference: 'outBound',
+      code: 'test003',
+      userId: user.id,
+    };
+    await notificationController.create(values);
+  }
 
   // update
 

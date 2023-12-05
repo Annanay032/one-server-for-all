@@ -1,0 +1,11 @@
+'use strict';
+require('dotenv').config();    // don't forget to require dotenv
+const path = require('path');
+const env = process.env.NODE_ENV || 'development';
+module.exports = {
+  config: path.resolve('migrationConfig.cjs'),
+  'models-path': path.resolve('src', 'models'),
+  'seeders-path': path.resolve('db', 'seeders'),
+  'migrations-path': path.resolve('src', 'migrations'),
+  env,
+};

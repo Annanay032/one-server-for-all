@@ -3,12 +3,13 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.addColumn('Users', 'managerId', {
-      type: Sequelize.INTEGER,
-      references: {
-        model: 'Users',
-        key: 'id',
-      },
+    await queryInterface.addColumn('Fields', 'options', {
+      type: Sequelize.JSONB,
+      defaultValue: [],
+      // references: {
+      //   model: 'Fields',
+      //   key: 'id',
+      // },
     });
     /**
      * Add altering commands here.

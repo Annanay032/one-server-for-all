@@ -2,8 +2,8 @@ import { db, Op, sequelize } from '../models/index.js';
 import BaseController from './baseController.js';
 
 class NotificationController extends BaseController {
-  constructor() {
-    super(db.Notification);
+  constructor(customerId) {
+    super(db.Notification, customerId);
     this.sequelize = sequelize;
   }
 
