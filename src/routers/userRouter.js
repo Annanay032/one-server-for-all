@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import userService from '../services/userService.js';
 import responseHelper from '../helpers/response.js';
+import { AuthenticationError } from '../helpers/customError.js';
 
 const router = Router();
 
@@ -12,11 +13,25 @@ router.get('/', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.get('/fields', (req, res, next) => {
-  const options = req.query;
-  return userService
-    .findAllForListing(options, req.appAuth)
-    .then(ret => responseHelper.success(res, ret.data, ret.meta))
+router.get('/options', (req, res, next) => userService.findAllByOptions(req.appAuth)
+  .then(ret => responseHelper.success(res, ret, ret.meta))
+  .catch(err => next(err)));
+
+router.get('/profile', (req, res, next) => {
+  const { userId } = req.appAuth;
+
+  const { profileToken } = req.query;
+  const timeStampHash = profileToken || '';
+  return userService.findOneByIdWithCustomerForProfile(userId, timeStampHash, req.appAuth)
+    .then(ret => {
+      if (!ret.data.active) {
+        throw new AuthenticationError();
+      }
+      if (ret.data.notModified) {
+        delete ret.user;
+      }
+      return responseHelper.success(res, ret.data, ret.meta);
+    })
     .catch(err => next(err));
 });
 
@@ -37,7 +52,7 @@ router.post('/', (req, res, next) => {
 });
 
 router.post('/:userId/edit', (req, res, next) => {
-  console.log('jhgfdssasasa', req)
+  console.log('jhgfdssasasa', req);
 
   const { userId } = req.params;
   const values = req.body;

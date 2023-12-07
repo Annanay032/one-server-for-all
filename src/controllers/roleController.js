@@ -50,10 +50,11 @@ class RoleController extends BaseController {
     return super.findAll(filter);
   }
 
-  findAllForOptions() {
+  findAllForOptions(customerId) {
     const filter = {
       where: {
         active: 1,
+        customerId,
       },
       attributes: [['id', 'value'], ['name', 'label']],
     };

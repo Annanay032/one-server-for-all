@@ -7,6 +7,20 @@ class NotificationController extends BaseController {
     this.sequelize = sequelize;
   }
 
+  updateById(values, id) {
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
+    const options = {
+      where: {
+        id,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return this.model.update(values, options);
+  }
+
+
   findAllForListing(options = {}) {
     return super.findAll();
   }

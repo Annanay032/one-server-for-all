@@ -39,11 +39,9 @@ registrationService.register = async values => {
   // if (!values.name || !values.password) {
     //   throw new ValidationError('Email or password not present');
     // }
-    console.log('ddddddddddddddddddddddddddd', values);
 
     const customerController = new CustomerController();
     const customer = await customerController.create(values);
-    console.log('ddddddddddddddddddddddddddd', customer.id);
     if (!customer) {
     throw new ResourceNotFoundError();
   }
@@ -60,7 +58,6 @@ registrationService.register = async values => {
 
   const companyValues = { ...values, customerId: +customer.id };
   // _set(values, 'customerId', customer.id);
-  console.log('companyValues',companyValues);
   const company = await companyController.create(companyValues);
   if (!company) {
     throw new ResourceNotFoundError();

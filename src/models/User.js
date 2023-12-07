@@ -16,10 +16,6 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       defaultValue: 'active',
     },
-    role: {
-      type: DataTypes.STRING,
-      defaultValue: 'admin',
-    },
     team: {
       type: DataTypes.STRING,
       defaultValue: 'owner',

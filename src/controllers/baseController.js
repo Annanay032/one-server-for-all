@@ -17,10 +17,11 @@ class BaseController {
   }
 
   create(values, options = {}) {
-    if (values.customerId) {
+    if (!values.customerId) {
       _set(values, 'customerId', this.customerId);
     }
     // _set(options, 'individualHooks', this.individualHooks);
+    console.log('hgfdd444444444444444444444', values)
     return this.model.create(values, options);
   }
 
@@ -155,9 +156,9 @@ class BaseController {
   }
 
   updateById(values, id) {
-    if (values.customerId) {
-      throw new Error('cappController - Invalid customer ID update');
-    }
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
     const options = {
       where: {
         id,

@@ -7,28 +7,28 @@ const router = Router();
 
 router.get('/', (req, res, next) => {
   const options = req.query;
-  return companyService.findAllForListing(options, req.cappAuth)
+  return companyService.findAllForListing(options, req.appAuth)
     .then(ret => responseHelper.success(res, ret.data, ret.meta))
     .catch(err => next(err));
 });
 
 router.post('/', (req, res, next) => {
   const values = req.body;
-  return companyService.create(values, req.cappAuth)
+  return companyService.create(values, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
 
 router.get('/search', (req, res, next) => {
   const options = req.query;
-  return companyService.findAllForSearch(options, req.cappAuth)
+  return companyService.findAllForSearch(options, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
 
 router.get('/:companyId', (req, res, next) => {
   const { companyId } = req.params;
-  return companyService.findOneByIdForView(companyId, req.cappAuth)
+  return companyService.findOneByIdForView(companyId, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
@@ -36,7 +36,7 @@ router.get('/:companyId', (req, res, next) => {
 router.post('/:companyId', (req, res, next) => {
   const { companyId } = req.params;
   const values = req.body;
-  return companyService.update(values, companyId, req.cappAuth)
+  return companyService.update(values, companyId, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });

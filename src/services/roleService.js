@@ -34,7 +34,7 @@ roleService.findOneById = (roleId, auth) => {
 
 roleService.findAllByOptions = auth => {
   const roleController = new RoleController(auth.customerId);
-  return roleController.findAllForOptions();
+  return roleController.findAllForOptions(auth.customerId);
 };
 
 roleService.create = async (values, auth) => {

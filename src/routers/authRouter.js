@@ -174,7 +174,7 @@ router.post('/login', (req, res, next) => {
 //   jwt.verify(token, config.app.capp.auth.jwtSecret, async (err, decoded) => {
 //     await authTokenService.markTokenInactive(decoded.key);
 //   });
-//   await userLoginActivityService.createLogoutEvent(req.cappAuth);
+//   await userLoginActivityService.createLogoutEvent(req.appAuth);
 //   res.clearCookie(config.app.capp.auth.token, {
 //     httpOnly: true, secure: true, sameSite: 'strict', domain: config.app.capp.auth.domain, path: '/',
 //   });

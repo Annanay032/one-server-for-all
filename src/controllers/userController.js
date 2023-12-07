@@ -14,6 +14,82 @@ class UserController extends BaseController {
       where: {
         customerId,
       },
+      include: [
+        {
+          model: db.User,
+          as: 'Manager',
+          attributes: ['id', 'name'],
+        },
+        {
+          model: db.Role,
+          attributes: ['id', 'name'],
+        },
+        {
+          model: db.UserAddressMapping,
+          as: 'UAMs',
+          separate: true,
+          where: {
+            active: 1,
+          },
+          required: false,
+          include: [
+            {
+              model: db.Address,
+              include: [
+                {
+                  model: db.CompanyAddressMapping,
+                  as: 'CAMs',
+                  where: {
+                    active: 1,
+                  },
+                  required: false,
+                  include: [
+                    {
+                      model: db.Company,
+                      attributes: ['id', 'companyName'],
+                    },
+                  ],
+                },
+                {
+                  model: db.BillingAddressMapping,
+                  as: 'BAMs',
+                  where: {
+                    active: 1,
+                  },
+                  required: false,
+                  include: [
+                    {
+                      model: db.Address,
+                      as: 'BillingAddress',
+                      attributes: ['id', 'keyword'],
+                    },
+                  ],
+                },
+                {
+                  model: db.Address,
+                  as: 'DefaultBillingAddress',
+                  attributes: ['id', 'keyword'],
+                },
+              ],
+              where: {
+                status: ['active'],
+              },
+              // required: false,
+            },
+          ],
+        },
+      ],
+    };
+    return super.findAll(filter);
+  }
+
+  findAllForOptions(customerId) {
+    const filter = {
+      where: {
+        active: 1,
+        customerId,
+      },
+      attributes: [['id', 'value'], ['name', 'label']],
     };
     return super.findAll(filter);
   }
