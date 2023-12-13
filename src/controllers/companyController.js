@@ -30,7 +30,7 @@ class CompanyController extends BaseController {
       where: {
         active: 1,
       },
-      attributes: ['id', 'name', 'code'],
+      attributes: [['id', 'value'], ['companyName', 'label'], 'code'],
     };
     if (options.query) {
       filter.where.name = {

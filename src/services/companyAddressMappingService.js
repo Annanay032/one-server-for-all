@@ -1,14 +1,15 @@
-import CompanyAddressMappingController from '../controllers/companyAddressMappingController';
-import utils from '../../helpers/utils';
+import CompanyAddressMappingController from '../controllers/companyAddressMappingController.js';
+import utils from '../helpers/utils.js';
 
 const companyAddressMappingService = {};
 
-companyAddressMappingService.bulkCreateForAddressId = async (records, addressId, auth, approversExist) => {
+companyAddressMappingService.bulkCreateForAddressId = async (records, addressId, auth) => {
   const companyAddressMappingController = new CompanyAddressMappingController(auth.customerId);
   const camRecords = records.map((record) => {
     const camRecord = utils.copyKeys(record, ['companyId', 'gstin', 'corporateIdentificationNumber']);
     camRecord.addressId = addressId;
-    camRecord.active = approversExist !== undefined ? approversExist : 1;
+    camRecord.active = 1;
+    // camRecord.active = approversExist !== undefined ? approversExist : 1;
     return camRecord;
   });
   return companyAddressMappingController.bulkCreate(camRecords);

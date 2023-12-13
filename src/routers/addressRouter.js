@@ -19,9 +19,9 @@ router.get('/all-mini', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.get('/search', (req, res, next) => {
+router.get('/options', (req, res, next) => {
   const options = req.qeury;
-  return addressService.findAllForSearch(options, req.appAuth)
+  return addressService.findAllForOptions(options, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
@@ -40,12 +40,9 @@ router.post('/bulk-upload', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.get('/user-address-mappings', (req, res, next) => {
-  return addressService.findAllwithUserMappings(req.appAuth)
-    .then(ret => responseHelper.success(res, ret))
-    .catch(err => next(err));
-});
-
+router.get('/user-address-mappings', (req, res, next) => addressService.findAllwithUserMappings(req.appAuth)
+  .then(ret => responseHelper.success(res, ret))
+  .catch(err => next(err)));
 
 router.get('/approvers', (req, res, next) => {
   const options = req.query;
@@ -57,7 +54,7 @@ router.get('/approvers', (req, res, next) => {
 router.get('/:addressId', (req, res, next) => {
   const { addressId } = req.params;
   const options = req.query;
-  return addressService.findOneByIdForView(addressId, req.appAuth , options)
+  return addressService.findOneByIdForView(addressId, req.appAuth, options)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });

@@ -6,7 +6,7 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/server.js",
+    "start": "nodemon ./src/server.js",
     "start:dev": "babel-node ./src/server.js",
     "migrate:up": "npx sequelize-cli db:migrate",
     "migrate:undo": "npx sequelize-cli db:migrate:undo",

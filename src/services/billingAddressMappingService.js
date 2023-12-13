@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import BillingAddressMappingController from '../controllers/billingAddressMappingController';
+import BillingAddressMappingController from '../controllers/billingAddressMappingController.js';
 
 const billingAddressMappingService = {};
 

@@ -117,20 +117,6 @@ class AddressController extends BaseController {
         id: addressId,
       },
       include: [{
-        model: db.AssetRoom,
-        include: [{
-          model: db.AssetRoomTagMapping,
-          as: 'ARTMs',
-          where: {
-            active: 1,
-          },
-          required: false,
-          separate: true,
-          include: [{
-            model: db.AssetRoomTag,
-          }],
-        }],
-      }, {
         model: db.CompanyAddressMapping,
         as: 'CAMs',
         where: {
@@ -140,7 +126,7 @@ class AddressController extends BaseController {
         separate: true,
         include: [{
           model: db.Company,
-          attributes: ['id', 'name'],
+          attributes: ['id', 'companyName'],
         }],
       }, {
         model: db.UserAddressMapping,
@@ -149,27 +135,8 @@ class AddressController extends BaseController {
         ...(uamFilter.active ? { where: uamFilter } : {}),
         include: [{
           model: db.User,
-          attributes: ['id', 'name', 'email', 'addressAdmin', 'costCentreAdmin', 'ledgerAdmin'],
+          attributes: ['id', 'name', 'email'],
         }],
-      }, {
-        model: db.Approval,
-        as: 'Approvals',
-        where: {
-          active: 1,
-        },
-        required: false,
-        separate: true,
-        order: [
-          ['sequence', 'ASC'],
-        ],
-        include: [{
-          model: db.User,
-          as: 'ActionBy',
-          attributes: ['id', 'name'],
-        }],
-      }, {
-        model: db.Approval,
-        as: 'CurrentApproval',
       }, {
         model: db.User,
         attributes: ['id', 'name'],
@@ -186,9 +153,6 @@ class AddressController extends BaseController {
         separate: true,
         required: false,
       }],
-      order: [
-        [{ model: db.AssetRoom }, 'id', 'ASC'],
-      ],
     };
     return super.findOne(filter);
   }
@@ -271,12 +235,12 @@ class AddressController extends BaseController {
     return super.findAll(filter);
   }
 
-  findAllForSearch(options = {}) {
+  findAllForOptions(options = {}) {
     const filter = {
       where: {
         active: 1,
       },
-      attributes: ['id', 'keyword', 'name', 'isBillingAddress'],
+      attributes: [['id', 'value'], ['keyword', 'label'], 'isBillingAddress'],
     };
     if (options.query) {
       filter.where.keyword = {

@@ -19,9 +19,9 @@ router.post('/', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.get('/search', (req, res, next) => {
+router.get('/address', (req, res, next) => {
   const options = req.query;
-  return companyService.findAllForSearch(options, req.appAuth)
+  return companyService.findAllForAddress(options, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });

@@ -1,8 +1,8 @@
-import utils from '../../helpers/utils';
-import { ValidationError } from '../../helpers/customError';
-import userCacheService from './userCacheService';
+import utils from '../helpers/utils.js';
+import { ValidationError } from '../helpers/customError.js';
+import userCacheService from './userCacheService.js';
 
-import CompanyController from '../controllers/companyController';
+import CompanyController from '../controllers/companyController.js';
 
 const companyService = {};
 
@@ -44,10 +44,17 @@ companyService.update = async (values, companyId, auth) => {
   return companyController.findOneById(companyId);
 };
 
-companyService.findAllForSearch = (options, auth) => {
+companyService.findAllForAddress = async (options, auth) => {
   const companyController = new CompanyController(auth.customerId);
-  return companyController.findAllForSearch(options);
-};
+  const comOptions = await companyController.findAllForSearch(options);
+  return comOptions.map(comData => {
+    const com = comData.toJSON();
+    return ({
+      ...com,
+      label: `${com.label} (${com.code})`,
+    });
+  });
+}
 
 companyService.findOneByReference = (reference, auth) => {
   const companyController = new CompanyController(auth.customerId);
@@ -59,12 +66,12 @@ companyService.findAllByReferences = (references, auth) => {
   return companyController.findAllByReferences(references);
 };
 
-companyService.findOneByCustomerId = (auth) => {
+companyService.findOneByCustomerId = auth => {
   const companyController = new CompanyController(auth.customerId);
   return companyController.findOneByCustomerId(auth.customerId);
 };
 
-companyService.findAllWithCustomerId = (auth) => {
+companyService.findAllWithCustomerId = auth => {
   const companyController = new CompanyController(auth.customerId);
   return companyController.findAllWithCustomerId(auth.customerId);
 };
