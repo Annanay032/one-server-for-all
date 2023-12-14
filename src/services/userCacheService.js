@@ -40,7 +40,7 @@ userCacheService.markInactiveByUserId = async (userId, auth) => {
 
 userCacheService.bulkMarkInactiveByUserId = async (userIds, auth) => {
   const userCacheController = new UserCacheController(auth.customerId);
-  const userCache = await userCacheController.bulkMarkInactiveByUserId(userIds);
+  const userCache = await userCacheController.bulkMarkInactiveByUserId(userIds.map((userId => userId.value)));
   return userCache;
 };
 

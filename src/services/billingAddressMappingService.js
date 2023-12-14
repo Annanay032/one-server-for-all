@@ -7,7 +7,7 @@ billingAddressMappingService.bulkCreateForAddressId = async (billingAddressIds, 
   const billingAddressMappingController = new BillingAddressMappingController(auth.customerId);
   const bamRecords = billingAddressIds.map(billingAddressId => ({
     addressId,
-    billingAddressId,
+    billingAddressId: billingAddressId.value,
   }));
   return billingAddressMappingController.bulkCreate(bamRecords);
 };

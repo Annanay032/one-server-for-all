@@ -141,9 +141,9 @@ class BaseController {
   }
 
   update(values, options = {}) {
-    if (!values.customerId) {
-      throw new Error('Base Controller - Invalid customer ID update');
-    }
+    // if (!values.customerId) {
+    //   throw new Error('Base Controller - Invalid customer ID update');
+    // }
     _set(options, 'where.customerId', this.customerId);
     // _set(options, 'individualHooks', this.individualHooks);
     return this.model.update(values, options);

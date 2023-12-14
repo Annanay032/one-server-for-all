@@ -118,7 +118,7 @@ userAddressMappingService.bulkCreateForAddressId = async (userIds, addressId, au
   const userAddressMappingController = new UserAddressMappingController(auth.customerId);
   const uamRecords = userIds.map(userId => ({
     addressId,
-    userId,
+    userId: userId.value,
     active: approversExist,
   }));
   return userAddressMappingController.bulkCreate(uamRecords);

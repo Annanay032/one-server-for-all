@@ -76,7 +76,7 @@ addressService.findAllForListing = async (options, auth) => {
     rejected: 0,
     'in-active': 0,
   };
-  counts.forEach((count) => {
+  counts.forEach(count => {
     statusCount[count.status] = +count.count;
   });
   return {
@@ -102,18 +102,18 @@ addressService.create = async (values, auth) => {
     throw new ValidationError('Address with the same keyword already exists');
   }
   if (values.isBillingAddress) {
-    if (!values.companyAddressMapping || values.companyAddressMapping.length < 1) {
+    if (!values.companyId) {
       throw new ValidationError('Invalid Action - Company must be associated for this billing address!');
     }
   }
-  const newValues = utils.copyKeys(values, ['name', 'keyword', 'reference', 'locationCode', 'line1', 'line2', 'landmark',
+  const newValues = utils.copyKeys(values, ['keyword', 'reference', 'line1', 'line2', 'landmark',
     'city', 'state', 'pincode', 'isBillingAddress', 'legalName', 'gstin', 'defaultBillingAddressId', 'country']);
   newValues.keywordSlug = utils.slugify(values.keyword);
   newValues.userId = auth.userId;
-  newValues.status = values.approvals.length ? 'pending-approval' : 'active';
+  newValues.status = 'active';
   // newValues.userDefinedFields = await getUserDefinedFieldsData(values, auth);
   // added for integration
-  newValues.active = (values.approvals.length || (values.active !== undefined && !values.active)) ? 0 : 1;
+  // newValues.active = (values.approvals.length || (values.active !== undefined && !values.active)) ? 0 : 1;
   newValues.active = 1;
   // if (!values.approvals.length && utils.hasKeys(values, ['active']) && !values.active) {
   //   newValues.status = 'in-active';
@@ -122,8 +122,8 @@ addressService.create = async (values, auth) => {
   if (values.isDefaultBillingAddress || (!address.defaultBillingAddressId && address.isBillingAddress)) {
     await addressController.updateById({ defaultBillingAddressId: address.id }, address.id);
   }
-  const entityUserMappingSet = new Set();
-  entityUserMappingSet.add(auth.userId);
+  // const entityUserMappingSet = new Set();
+  // entityUserMappingSet.add(auth.userId);
   // if (values.approvals && values.approvals.length > 0) {
   //   values.approvals.forEach((approval) => {
   //     approval.approvers.forEach((approver) => {
@@ -134,15 +134,16 @@ addressService.create = async (values, auth) => {
   // }
   // const entityUserMappings = [...entityUserMappingSet].map(userId => ({ userId }));
   // await entityUserMappingService.bulkCreateForAddress(entityUserMappings, address.id, auth);
-  // const approversExist = values.approvals.length ? 0 : 1;
+  const approversExist = 1;
   if (values.userIds && values.userIds.length > 0) {
   // newValues.active = (values.approvals.length || (values.active !== undefined && !values.active)) ? 0 : 1;
     // await userAddressMappingService.bulkCreateForAddressId(values.userIds, address.id, auth, approversExist);
     await userAddressMappingService.bulkCreateForAddressId(values.userIds, address.id, auth);
     await userCacheService.bulkMarkInactiveByUserId(values.userIds, auth);
   }
-  if (values.companyAddressMapping && values.companyAddressMapping.length > 0) {
-    await companyAddressMappingService.bulkCreateForAddressId(values.companyAddressMapping, address.id, auth, approversExist);
+  if (values.companyId) {
+    const companyAddressMapping = [{ companyId: values.companyId, gstin: values.gstin, corporateIdentificationNumber: values.gstin }];
+    await companyAddressMappingService.bulkCreateForAddressId(companyAddressMapping, address.id, auth, approversExist);
   }
   await billingAddressMappingService.bulkCreateForAddressId(values.billingAddressIds, address.id, auth);
   const addressRetObj = await addressController.findOneByIdForView(address.id);
@@ -238,13 +239,13 @@ addressService.markInactiveById = async (addressId, auth) => {
   const userMappingData = await addressController.findAllUamById(addressId);
   const userIds = new Set();
   if (userMappingData && userMappingData.UAMs.length > 0) {
-    userMappingData.UAMs.forEach((uam) => {
+    userMappingData.UAMs.forEach(uam => {
       userIds.add(uam.userId);
     });
     const uamIds = userMappingData.UAMs.map(uam => uam.id);
     const userUAMData = await userController.findOneByIdWithUAMs([...userIds]);
     const addressName = userMappingData.keyword;
-    userUAMData.forEach((user) => {
+    userUAMData.forEach(user => {
       if (user.UAMs.length === 1) {
         throw new ValidationError(`Cannot Mark Inactive. "${user.name}" has ONLY ONE AddressMapping and with "${addressName}"`);
       }
@@ -252,7 +253,7 @@ addressService.markInactiveById = async (addressId, auth) => {
     await userAddressMappingController.bulkMarkInactiveById(uamIds);
   }
   if (userMappingData && userMappingData.CAMs.length > 0) {
-    userMappingData.CAMs.forEach((cam) => {
+    userMappingData.CAMs.forEach(cam => {
       userIds.add(cam.userId);
     });
     const camIds = userMappingData.CAMs.map(cam => cam.id);
@@ -269,14 +270,14 @@ addressService.markActiveById = async (addressId, auth) => {
   const userMappingData = await addressController.findAllInactiveUamAndActiveUserById(addressId);
   const userIds = new Set();
   if (userMappingData && userMappingData.UAMs.length > 0) {
-    userMappingData.UAMs.forEach((uam) => {
+    userMappingData.UAMs.forEach(uam => {
       userIds.add(uam.userId);
     });
     const uamIds = userMappingData.UAMs.map(uam => uam.id);
     await userAddressMappingController.bulkMarkActiveById(uamIds);
   }
   if (userMappingData && userMappingData.CAMs.length > 0) {
-    userMappingData.CAMs.forEach((cam) => {
+    userMappingData.CAMs.forEach(cam => {
       userIds.add(cam.userId);
     });
     const camIds = userMappingData.CAMs.map(cam => cam.id);
@@ -285,7 +286,6 @@ addressService.markActiveById = async (addressId, auth) => {
   await userCacheService.bulkMarkInactiveByUserId(Array.from(userIds), auth);
   return addressController.updateById({ active: 1, status: 'active' }, addressId);
 };
-
 
 addressService.getGSTIN = async (addressId, companyId, auth) => {
   const addressController = new AddressController(auth.customerId, auth.transaction);
