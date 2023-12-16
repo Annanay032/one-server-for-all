@@ -25,6 +25,7 @@
   "dependencies": {
     "@babel/core": "^7.23.3",
     "@babel/register": "^7.12.1",
+    "@vercel/postgres": "^0.5.1",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.7.2",
