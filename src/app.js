@@ -12,6 +12,8 @@ import notificationRouter from './routers/notificationRouter.js';
 import roleRouter from './routers/roleRouter.js';
 import companyRouter from './routers/companyRouter.js';
 import addressRouter from './routers/addressRouter.js';
+import customModuleRouter from './routers/customModuleRouter.js';
+import customTransactionRouter from './routers/customTransactionRouter.js';
 import responseHelper from './helpers/response.js';
 import { RouteNotFoundError } from './helpers/customError.js';
 
@@ -52,6 +54,8 @@ app.use('/roles', roleRouter);
 app.use('/notifications', notificationRouter);
 app.use('/addresses', addressRouter);
 app.use('/company', companyRouter);
+app.use('/custom-module', customModuleRouter);
+app.use('/custom-transaction', customTransactionRouter);
 
 app.use((req, res, next) => {
   next(new RouteNotFoundError());

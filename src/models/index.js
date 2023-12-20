@@ -57,7 +57,7 @@ Object.keys(db).forEach(modelName => {
 });
 
 sequelize
-  .sync()
+  .sync({alter: true})
   .then((val) => {
     console.log('syncing database success');
     // Object.keys(val.models).forEach(async modelName => {

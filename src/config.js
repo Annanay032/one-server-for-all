@@ -26,6 +26,14 @@ const config = {
     dialect: process.env.DB_DIALECT,
     logging: process.env.DEV_DB_LOGGING || false,
   },
+  // db: {
+  //   username: process.env.POSTGRES_USER,
+  //   password: process.env.POSTGRES_PASSWORD,
+  //   database: process.env.POSTGRES_DATABASE,
+  //   host: process.env.POSTGRES_HOST,
+  //   dialect: process.env.DB_DIALECT,
+  //   logging: process.env.DEV_DB_LOGGING || false,
+  // },
   log: {
     folder: process.env.DEV_LOG_FOLDER || '../logs',
     filename: process.env.DEV_LOG_FILENAME || 'vishnu-all.log',
