@@ -120,6 +120,9 @@ export default function (sequelize, DataTypes) {
       foreignKey: 'customerId',
     });
     // ;
+    Customer.hasMany(models.CustomModule, {
+      foreignKey: 'customerId',
+    });
     //     Customer.belongsTo(models.User, {
     //       foreignKey: 'automationUserId',
     //       as: 'AutomationUser',

@@ -18,7 +18,7 @@ export default function (sequelize, DataTypes) {
     // },
   }, {});
 
-  UserAddressMapping.associate = (models) => {
+  UserAddressMapping.associate = models => {
     UserAddressMapping.belongsTo(models.Customer, {
       foreignKey: {
         fieldName: 'customerId',

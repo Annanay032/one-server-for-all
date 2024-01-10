@@ -15,9 +15,9 @@ const slugify = val => {
 
 export default function (sequelize, DataTypes) {
   const Field = sequelize.define('Field', {
-    source: {
-      type: DataTypes.STRING,
-    },
+    // source: {
+    //   type: DataTypes.STRING,
+    // },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -26,23 +26,29 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.STRING,
       // text, select
     },
+    reference: {
+      type: DataTypes.TEXT,
+      // text, select
+    },
     fieldType: {
       type: DataTypes.STRING,
       // input, password, multiselect
     },
-    sourceFieldType: {
-      type: DataTypes.STRING,
-      // custom field, system field
-    },
+    // sourceFieldType: {
+    //   type: DataTypes.STRING,
+    //   // custom field, system field
+    // },
     isParentField: {
       type: DataTypes.BOOLEAN,
+      defaultValue: false,
+
     },
     options: {
       type: DataTypes.JSONB,
       defaultValue: [],
     },
 
-    label: {
+    fieldName: {
       type: DataTypes.TEXT,
     },
     slug: {
@@ -51,7 +57,7 @@ export default function (sequelize, DataTypes) {
     sno: {
       type: DataTypes.INTEGER,
     },
-    transactionType: {
+    moduleType: {
       type: DataTypes.STRING, // requisition.quote-request,auction-request,purchase-order,rate-contract,invoice,inward
     },
     validation: {
@@ -67,12 +73,6 @@ export default function (sequelize, DataTypes) {
     fieldKey: {
       type: DataTypes.STRING,
     },
-    userDefinedFieldKey: {
-      type: DataTypes.UUID,
-    },
-    labelSlug: {
-      type: DataTypes.TEXT,
-    },
     isRequired: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
@@ -82,7 +82,7 @@ export default function (sequelize, DataTypes) {
     },
     isSearchable: {
       type: DataTypes.INTEGER,
-      defaultValue: 0,
+      defaultValue: 1,
     },
     helpText: {
       type: DataTypes.TEXT,
@@ -95,25 +95,28 @@ export default function (sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    dependentFields: {
+      type: DataTypes.JSONB,
+      defaultValue: [],
+    }
   }, {
     hooks: {
       beforeSave: attributes => {
-        attributes.set('slug', slugify(attributes.get('label')));
+        attributes.set('slug', slugify(attributes.get('fieldName')));
       },
     },
   });
 
   Field.associate = models => {
-    Field.belongsTo(models.Customer, {
+    // Field.belongsTo(models.Customer, {
+    //   foreignKey: {
+    //     fieldName: 'customerId',
+    //     allowNull: false,
+    //   },
+    // });
+    Field.belongsTo(models.Section, {
       foreignKey: {
-        fieldName: 'customerId',
-        allowNull: false,
-      },
-    });
-    Field.belongsTo(models.User, {
-      foreignKey: {
-        fieldName: 'userId',
-        allowNull: false,
+        fieldName: 'sectionId',
       },
     });
   };

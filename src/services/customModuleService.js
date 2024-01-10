@@ -4,6 +4,8 @@ import pkg from 'joi';
 import uuid4 from 'uuid4';
 import utils from '../helpers/utils.js';
 import FieldController from '../controllers/fieldController.js';
+import CustomModuleController from '../controllers/customModuleController.js';
+import SectionController from '../controllers/sectionController.js';
 // import SectionController from '../controllers/sectionController';
 import { ValidationError } from '../helpers/customError.js';
 // import fieldHelper from '../helpers/fieldsHelper';
@@ -102,17 +104,19 @@ customModuleService.validateFieldValues = async (fields, values) => {
     'payment-terms-select': Joi.any(),
     'item-type-select': Joi.string(),
     'user-select': Joi.number().strict(),
-    attachments: Joi.array().items(Joi.object({
-      key: Joi.string(),
-      name: Joi.string(),
-      path: Joi.string(),
-      type: Joi.string(),
-      size: Joi.number().strict(),
-      isUploaded: Joi.boolean(),
-      isUploadFailed: Joi.boolean(),
-      customId: Joi.string(),
-      fileObj: Joi.any(),
-    })),
+    attachments: Joi.array().items(
+      Joi.object({
+        key: Joi.string(),
+        name: Joi.string(),
+        path: Joi.string(),
+        type: Joi.string(),
+        size: Joi.number().strict(),
+        isUploaded: Joi.boolean(),
+        isUploadFailed: Joi.boolean(),
+        customId: Joi.string(),
+        fileObj: Joi.any(),
+      }),
+    ),
     product: Joi.number().strict(),
     'uom-select': Joi.number().strict(),
     price: Joi.number(),
@@ -134,53 +138,82 @@ customModuleService.validateFieldValues = async (fields, values) => {
     'po-map-select': Joi.number().strict(),
   };
   const schemaKeys = {};
-  fields.forEach((field) => {
-    schemaKeys[field.key] = field.mandatory ? joiTypeFieldTypeMap[field.type].required() : joiTypeFieldTypeMap[field.type].allow('', null);
+  fields.forEach(field => {
+    schemaKeys[field.key] = field.mandatory
+      ? joiTypeFieldTypeMap[field.type].required()
+      : joiTypeFieldTypeMap[field.type].allow('', null);
   });
   const joiSchema = Joi.object(schemaKeys);
   const validate = joiSchema.validate(values, { abortEarly: false });
   if (validate.error) {
-    const validations = validate.error.details.map(d => d.message).toLocaleString();
+    const validations = validate.error.details
+      .map(d => d.message)
+      .toLocaleString();
     throw new ValidationError(validations);
   }
   console.log('Finish validateFieldValues!!!');
 };
 
 customModuleService.create = async (values, auth) => {
-  await validateFieldValueInput(values, auth);
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeevalues', values)
+
+  // await validateFieldValueInput(values, auth);
+  const customModuleController = new CustomModuleController(auth.customerId);
+
   const fieldController = new FieldController(auth.customerId);
   const sectionController = new SectionController(auth.customerId);
-  const newFieldValues = utils.copyKeys(values, ['label', 'fieldType', 'fieldOptionItems',
-    'fieldInputType', 'mandatory', 'sourceType',
-    'sno', 'isOrgLevel', 'transactionType', 'weightagePercentage', 'active',
-    'fieldKey', 'userDefinedFieldKey', 'visibleToSupplier',
-    'defaultValue', 'visibleInListing', 'visibleInDocument', 'isSearchable',
-    'sectionId', 'visibleInTransaction', 'helpText', 'visibleInReport', 'formulae', 'toBeFilledBySupplier', 'feedbackSettings', 'isAggregate',
-    'type', 'key', 'validation', 'isSystemField', 'options', 'size', 'wrapText', 'isCalculated', 'headerColumnColor']);
-  newFieldValues.slug = utils.slugify(values.label);
-  newFieldValues.labelSlug = `cf_${utils.getSlugifyLabel(values.label)}`;
-  if (values.transactionType === 'requisition') {
-    newFieldValues.inputBy = ['customer'];
-    newFieldValues.userDefinedFieldKey = uuid4();
+
+  const newModuleValues = utils.copyKeys(values, [
+    'key',
+    'name',
+    'reference',
+    'slug',
+    'hasRoleAccess',
+    'hasUserAccess',
+    // 'sections',
+  ]);
+  newModuleValues.slug = utils.slugify(values.name);
+  newModuleValues.key = uuid4();
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeee', newModuleValues)
+  const customModule = await customModuleController.create(newModuleValues);
+  if (!customModule) {
+    throw new ValidationError();
   }
-  const field = await fieldController.create(newFieldValues);
-  const options = {
-    type: values.sectionType,
-  };
-  if (values.sourceType === 'aerchain-custom') {
-    // Creating for other master sections for all transactions
-    const masterSections = await sectionController.findAllActiveMasterSectionsOfAllTransactions(options);
-    const transactionFieldsToCreate = masterSections.map(section => {
-      const newValues = newFieldValues;
-      newValues.sectionId = section.id;
-      newValues.parentFieldId = field.id;
-      return newValues;
-    });
-    if (transactionFieldsToCreate.length) {
-      await fieldController.bulkCreate(transactionFieldsToCreate);
+
+  const newSectionValues = [...values.sections].map(sec => ({
+    ...sec,
+    customModuleId: customModule.id,
+    slug: utils.slugify(newModuleValues.sectionName),
+  }));
+
+  if (!newSectionValues && !newSectionValues.length) {
+    throw new ValidationError();
+  }
+  const section = await sectionController.bulkCreate(newSectionValues);
+  const sectionMap = {};
+  section?.forEach(({ sectionKey, id }) => {
+    if (sectionKey && id) {
+      if (!sectionMap[sectionKey]) {
+        sectionMap[sectionKey] = null;
+      }
+      sectionMap[sectionKey] = id;
     }
+  });
+  const newFieldValues = [...values.fields].map(fv => ({
+    ...fv,
+    label: fv.name,
+    sectionId: sectionMap[fv.sectionKey],
+    moduleType: 'customModule',
+  }));
+
+  newFieldValues.key = uuid4();
+
+  if (!newFieldValues && !newFieldValues.length) {
+    throw new ValidationError();
   }
-  return customModuleService.findOneMasterByIdForView(field.id, auth);
+  const field = await fieldController.bulkCreate(newFieldValues);
+
+  return customModule;
 };
 
 // customModuleService.updateById = async (fieldId: number, values: any, auth: any): Promise<any> => {

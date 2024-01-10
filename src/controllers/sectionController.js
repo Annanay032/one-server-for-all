@@ -1,9 +1,9 @@
 import BaseController from './baseController.js';
 import { db, Op } from '../models/index.js';
 
-class CustomModuleController extends BaseController {
+class SectionController extends BaseController {
   constructor(customerId, transaction) {
-    super(db.CustomModule, customerId, { individualHooks: true, transaction });
+    super(db.Section, customerId, { individualHooks: true, transaction });
   }
 
   findAllForListing(options) {
@@ -99,4 +99,4 @@ class CustomModuleController extends BaseController {
     return super.findAll(filter);
   }
 }
-export default CustomModuleController;
+export default SectionController;
