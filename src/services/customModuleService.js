@@ -5,6 +5,7 @@ import uuid4 from 'uuid4';
 import utils from '../helpers/utils.js';
 import FieldController from '../controllers/fieldController.js';
 import CustomModuleController from '../controllers/customModuleController.js';
+import ModuleAccessController from '../controllers/moduleAccessController.js';
 import SectionController from '../controllers/sectionController.js';
 // import SectionController from '../controllers/sectionController';
 import { ValidationError } from '../helpers/customError.js';
@@ -16,22 +17,19 @@ import { ValidationError } from '../helpers/customError.js';
 const { Joi } = pkg;
 const customModuleService = {};
 
-// customModuleService.findAllMasterForListing = async (options: any, auth: any): Promise<any> => {
-//   const fieldController = new FieldController(auth.customerId);
-//   const masterFields = await fieldController.findAllForListing(options);
-//   return {
-//     data: masterFields.rows,
-//     meta: {
-//       count: masterFields.count,
-//     },
-//   };
-// };
+customModuleService.findAllForListing = async (options, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModule = await customModuleController.findAllForListing(options);
+  return {
+    data: customModule,
+  };
+};
 
-// customModuleService.findOneMasterByIdForView = async (sectionId: number, auth: any): Promise<any> => {
-//   const fieldController = new FieldController(auth.customerId);
-//   const field = await fieldController.findOneByIdForView(sectionId);
-//   return field;
-// };
+customModuleService.findOneByIdForView = async (cmId, options, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModule = await customModuleController.findOneByIdForView(cmId, options);
+  return customModule;
+};
 
 // customModuleService.validateFieldData = async (fields: any): Promise<any> => {
 //   fields.forEach((field: any) => {
@@ -155,10 +153,11 @@ customModuleService.validateFieldValues = async (fields, values) => {
 };
 
 customModuleService.create = async (values, auth) => {
-  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeevalues', values)
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeevalues', values);
 
   // await validateFieldValueInput(values, auth);
   const customModuleController = new CustomModuleController(auth.customerId);
+  const moduleAccessController = new ModuleAccessController(auth.customerId);
 
   const fieldController = new FieldController(auth.customerId);
   const sectionController = new SectionController(auth.customerId);
@@ -173,17 +172,52 @@ customModuleService.create = async (values, auth) => {
     // 'sections',
   ]);
   newModuleValues.slug = utils.slugify(values.name);
+  newModuleValues.userId = auth.userId;
+  newModuleValues.customerId = auth.customerId;
   newModuleValues.key = uuid4();
-  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeee', newModuleValues)
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeee', newModuleValues);
   const customModule = await customModuleController.create(newModuleValues);
   if (!customModule) {
     throw new ValidationError();
   }
 
+  if (newModuleValues.hasRoleAccess) {
+    const newModuleAccessValues = [...values.roleIds].map(mac => ({
+      // ...mac,
+      roleId: mac,
+      customModuleId: customModule.id,
+      isCustomModule: true,
+      customerId: auth.customerId,
+    }));
+
+    const moduleAccess = await moduleAccessController.bulkCreate(
+      newModuleAccessValues,
+    );
+    if (!moduleAccess) {
+      throw new ValidationError();
+    }
+  } else if (newModuleValues.hasUserAccess) {
+    const newModuleAccessValues = [...values.userIds].map(mac => ({
+      // ...mac,
+      userId: mac,
+      customModuleId: customModule.id,
+      isCustomModule: true,
+      customerId: auth.customerId,
+    }));
+
+    const moduleAccess = await moduleAccessController.bulkCreate(
+      newModuleAccessValues,
+    );
+    if (!moduleAccess) {
+      throw new ValidationError();
+    }
+  }
+
   const newSectionValues = [...values.sections].map(sec => ({
     ...sec,
     customModuleId: customModule.id,
-    slug: utils.slugify(newModuleValues.sectionName),
+    slug: utils.slugify(sec.sectionName),
+    key: uuid4(),
   }));
 
   if (!newSectionValues && !newSectionValues.length) {
@@ -204,9 +238,8 @@ customModuleService.create = async (values, auth) => {
     label: fv.name,
     sectionId: sectionMap[fv.sectionKey],
     moduleType: 'customModule',
+    key: uuid4(),
   }));
-
-  newFieldValues.key = uuid4();
 
   if (!newFieldValues && !newFieldValues.length) {
     throw new ValidationError();

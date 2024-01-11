@@ -21,12 +21,12 @@ export default function (sequelize, DataTypes) {
   });
 
   ModuleAccess.associate = models => {
-    // ModuleAccess.belongsTo(models.Customer, {
-    //   foreignKey: {
-    //     fieldName: "customerId",
-    //     allowNull: false,
-    //   },
-    // });
+    ModuleAccess.belongsTo(models.Customer, {
+      foreignKey: {
+        fieldName: 'customerId',
+        allowNull: false,
+      },
+    });
     ModuleAccess.belongsTo(models.CustomModule, {
       foreignKey: {
         fieldName: 'customModuleId',

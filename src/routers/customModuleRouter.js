@@ -19,8 +19,10 @@ router.post('/', (req, res, next) => {
 });
 
 router.get('/:cmId', (req, res, next) => {
-  const { companyId } = req.params;
-  return customModuleService.findOneByIdForView(companyId, req.appAuth)
+  console.log('uytrew34232232222222222', req.params, req.body, req.query)
+  const { cmId } = req.params;
+  const options = req.query
+  return customModuleService.findOneByIdForView(cmId, options, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
