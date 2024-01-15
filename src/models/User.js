@@ -71,6 +71,10 @@ export default function (sequelize, DataTypes) {
     User.belongsTo(models.UniqueUser, {
       foreignKey: 'uniqueUserId',
     });
+
+    User.hasMany(models.ModuleAccess, {
+      foreignKey: 'userId',
+    });
   };
 
   // User.sync();

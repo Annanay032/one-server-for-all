@@ -27,10 +27,17 @@ router.get('/:cmId', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.post('/:cmId', (req, res, next) => {
-  const { companyId } = req.params;
+router.delete('/:cmId', (req, res, next) => {
+  const { cmId } = req.params;
+  return customModuleService.deleteById(cmId, req.appAuth)
+    .then(ret => responseHelper.success(res, ret))
+    .catch(err => next(err));
+});
+
+router.post('/:cmId/edit', (req, res, next) => {
+  const { cmId } = req.params;
   const values = req.body;
-  return customModuleService.update(values, companyId, req.appAuth)
+  return customModuleService.update(values, cmId, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });

@@ -6,7 +6,8 @@ let io;
 const userData = {};
 const socketData = {};
 const getNotifications = async (params = {}) => {
-  const { page = 1, limit = 20, userId } = params;
+  const { page = 1, limit = 20, userId= 1 } = params;
+  console.log('sdddddddddddddddddddddddddddddddddsssssssssss', userId, params)
   if (!userData[userId]) {
     userData[userId] = [];
   }

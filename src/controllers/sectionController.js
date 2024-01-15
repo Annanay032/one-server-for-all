@@ -98,5 +98,30 @@ class SectionController extends BaseController {
     };
     return super.findAll(filter);
   }
+
+  updateById(values, id) {
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
+    const options = {
+      where: {
+        id,
+        // customerId: this.customerId,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return this.model.update(values, options);
+  }
+
+  updateByCMId(values, customModuleId) {
+    const options = {
+      where: {
+        customModuleId,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return this.model.update(values, options);
+  }
+
 }
 export default SectionController;

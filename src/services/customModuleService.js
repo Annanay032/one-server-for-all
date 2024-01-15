@@ -2,11 +2,13 @@
 // import { mapSeries } from 'bluebird';
 import pkg from 'joi';
 import uuid4 from 'uuid4';
+import bb from 'bluebird';
 import utils from '../helpers/utils.js';
 import FieldController from '../controllers/fieldController.js';
 import CustomModuleController from '../controllers/customModuleController.js';
 import ModuleAccessController from '../controllers/moduleAccessController.js';
 import SectionController from '../controllers/sectionController.js';
+
 // import SectionController from '../controllers/sectionController';
 import { ValidationError } from '../helpers/customError.js';
 // import fieldHelper from '../helpers/fieldsHelper';
@@ -15,6 +17,7 @@ import { ValidationError } from '../helpers/customError.js';
 // const Joi = require('joi');
 
 const { Joi } = pkg;
+const { mapSeries } = bb;
 const customModuleService = {};
 
 customModuleService.findAllForListing = async (options, auth) => {
@@ -27,8 +30,220 @@ customModuleService.findAllForListing = async (options, auth) => {
 
 customModuleService.findOneByIdForView = async (cmId, options, auth) => {
   const customModuleController = new CustomModuleController(auth.customerId);
-  const customModule = await customModuleController.findOneByIdForView(cmId, options);
+  const customModule = await customModuleController.findOneByIdForView(
+    cmId,
+    options,
+  );
   return customModule;
+};
+
+customModuleService.update = async (values, cmId, auth) => {
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeevalues', values);
+
+  // await validateFieldValueInput(values, auth);
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const moduleAccessController = new ModuleAccessController(auth.customerId);
+
+  const fieldController = new FieldController(auth.customerId);
+  const sectionController = new SectionController(auth.customerId);
+
+  const newModuleValues = utils.copyKeys(values, [
+    'key',
+    'name',
+    'reference',
+    'slug',
+    'hasRoleAccess',
+    'hasUserAccess',
+    // 'sections',
+  ]);
+  newModuleValues.slug = utils.slugify(values.name);
+  newModuleValues.userId = auth.userId;
+  newModuleValues.customerId = auth.customerId;
+  newModuleValues.key = uuid4();
+  console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeee', newModuleValues);
+  const customModule = await customModuleController.updateById(
+    newModuleValues,
+    cmId,
+  );
+  if (!customModule) {
+    throw new ValidationError();
+  }
+
+  if (newModuleValues.hasRoleAccess) {
+    const newModuleAccessValues = [...values.roleIds].map(mac => ({
+      // ...mac,
+      roleId: mac,
+      customModuleId: customModule.id,
+      isCustomModule: true,
+      customerId: auth.customerId,
+    }));
+
+    const moduleAccess = await moduleAccessController.bulkCreate(
+      newModuleAccessValues,
+    );
+    if (!moduleAccess) {
+      throw new ValidationError();
+    }
+  } else if (newModuleValues.hasUserAccess) {
+    const newModuleAccessValues = [...values.userIds].map(mac => ({
+      // ...mac,
+      userId: mac,
+      customModuleId: customModule.id,
+      isCustomModule: true,
+      customerId: auth.customerId,
+    }));
+
+    const moduleAccess = await moduleAccessController.bulkCreate(
+      newModuleAccessValues,
+    );
+    if (!moduleAccess) {
+      throw new ValidationError();
+    }
+  }
+
+  // const newSectionValues = [...values.sections].map(sec => ({
+  //   ...sec,
+  //   customModuleId: customModule.id,
+  //   slug: utils.slugify(sec.sectionName),
+  //   // key: uuid4(),
+  // }));
+
+  const sectionMap = {};
+
+  await mapSeries(values.sections, async (item, index) => {
+    const newSectionValues = {
+      ...item,
+      customModuleId: cmId,
+      slug: utils.slugify(item.sectionName),
+      active: !item.deleted,
+      delete: item.deleted ? 1 : 0,
+      // key: uuid4(),
+    };
+
+    if (!newSectionValues.customModuleId) {
+      throw new ValidationError();
+    }
+    let section = {};
+    if (newSectionValues.id) {
+      section = await sectionController.updateById(
+        newSectionValues,
+        newSectionValues.id,
+      );
+    } else {
+      section = await sectionController.create(newSectionValues);
+    }
+
+    console.log('ffffffffffffffffffffrrrrrrrrrrrrnewSectionValues', section);
+
+    if (section.sectionKey && section.id) {
+      if (!sectionMap[section.sectionKey]) {
+        sectionMap[section.sectionKey] = null;
+      }
+      sectionMap[section.sectionKey] = section.id;
+    } else {
+      if (!sectionMap[newSectionValues.sectionKey]) {
+        sectionMap[newSectionValues.sectionKey] = null;
+      }
+      sectionMap[newSectionValues.sectionKey] = newSectionValues.id;
+    }
+  });
+
+  // const newFieldValues = [...values.fields].map(fv => ({
+  //   ...fv,
+  //   label: fv.name,
+  //   sectionId: sectionMap[fv.sectionKey],
+  //   moduleType: 'customModule',
+  //   active: !item.deleted,
+  //   delete: item.deleted,
+  //   // key: uuid4(),
+  // }));
+
+  // if (!newFieldValues && !newFieldValues.length) {
+  //   throw new ValidationError();
+  // }
+
+  await mapSeries(values.fields, async (item, index) => {
+    const newFieldValues = {
+      ...item,
+      label: item.name,
+      sectionId: sectionMap[item.sectionKey],
+      moduleType: 'customModule',
+      active: !item.deleted,
+      delete: item.deleted ? 1 : 0,
+      // key: uuid4(),
+    };
+
+    if (!newFieldValues.sectionId) {
+      throw new ValidationError();
+    }
+    // let field = {};
+    if (newFieldValues.id) {
+      // field =
+      await fieldController.updateById(newFieldValues, newFieldValues.id);
+    } else {
+      // field =
+      await fieldController.create(newFieldValues);
+    }
+  });
+
+  // if (!newSectionValues && !newSectionValues.length) {
+  //   throw new ValidationError();
+  // }
+  // const section = await sectionController.bulkCreate(newSectionValues);
+  // const sectionMap = {};
+  // section?.forEach(({ sectionKey, id }) => {
+  //   if (sectionKey && id) {
+  //     if (!sectionMap[sectionKey]) {
+  //       sectionMap[sectionKey] = null;
+  //     }
+  //     sectionMap[sectionKey] = id;
+  //   }
+  // });
+
+  return customModule;
+};
+
+customModuleService.deleteById = async (cmId, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const moduleAccessController = new ModuleAccessController(auth.customerId);
+
+  const fieldController = new FieldController(auth.customerId);
+  const sectionController = new SectionController(auth.customerId);
+
+  customModuleController.updateById(
+    { delete: 1, active: false },
+    cmId,
+  );
+
+  await moduleAccessController.updateByCMId(
+    { delete: 1, active: false },
+    cmId,
+  );
+
+  const sections = await sectionController.updateByCMId(
+    { delete: 1, active: false },
+    cmId,
+  );
+
+  // console.log('erfrrrrrrrrrr', sec)
+
+  await mapSeries(sections, async (item, index) => {
+    await fieldController.updateBySectionId(
+      { delete: 1, active: false },
+      item,
+    );
+  });
+
+  // await fieldController.updateBySectionId(
+  //   { delete: 1, active: false },
+  //   cmId,
+  // );
+
+  // if (!customModule) {
+  //   throw new ValidationError();
+  // }
+
+  return 'success';
 };
 
 // customModuleService.validateFieldData = async (fields: any): Promise<any> => {
@@ -217,7 +432,7 @@ customModuleService.create = async (values, auth) => {
     ...sec,
     customModuleId: customModule.id,
     slug: utils.slugify(sec.sectionName),
-    key: uuid4(),
+    // key: uuid4(),
   }));
 
   if (!newSectionValues && !newSectionValues.length) {
@@ -238,7 +453,7 @@ customModuleService.create = async (values, auth) => {
     label: fv.name,
     sectionId: sectionMap[fv.sectionKey],
     moduleType: 'customModule',
-    key: uuid4(),
+    // key: uuid4(),
   }));
 
   if (!newFieldValues && !newFieldValues.length) {

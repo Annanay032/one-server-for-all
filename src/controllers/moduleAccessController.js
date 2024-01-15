@@ -1,5 +1,5 @@
-import BaseController from './baseController.js';
-import { db, Op } from '../models/index.js';
+import BaseController from "./baseController.js";
+import { db, Op } from "../models/index.js";
 
 class CustomModuleController extends BaseController {
   constructor(customerId, transaction) {
@@ -30,7 +30,7 @@ class CustomModuleController extends BaseController {
       where: {
         active: 1,
       },
-      attributes: [['id', 'value'], ['companyName', 'label'], 'code'],
+      attributes: [["id", "value"], ["companyName", "label"], "code"],
     };
     if (options.query) {
       filter.where.name = {
@@ -94,9 +94,20 @@ class CustomModuleController extends BaseController {
         slug: distintSlugs,
         active: 1,
       },
-      attributes: ['id', 'slug', 'name', 'code'],
+      attributes: ["id", "slug", "name", "code"],
     };
     return super.findAll(filter);
+  }
+
+  updateByCMId(values, customModuleId) {
+    const options = {
+      where: {
+        customModuleId,
+        customerId: this.customerId,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return super.update(values, options);
   }
 }
 export default CustomModuleController;

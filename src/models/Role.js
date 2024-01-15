@@ -14,47 +14,51 @@ const slugify = val => {
 };
 
 export default function (sequelize, DataTypes) {
-  const Role = sequelize.define('Role', {
-    name: {
-      type: DataTypes.STRING,
-      defaultValue: 'Admin',
-      allowNull: false,
+  const Role = sequelize.define(
+    'Role',
+    {
+      name: {
+        type: DataTypes.STRING,
+        defaultValue: 'Admin',
+        allowNull: false,
+      },
+      slug: {
+        type: DataTypes.STRING,
+      },
+      description: {
+        type: DataTypes.TEXT,
+        defaultValue: 'Is set as default admin',
+      },
+      auto: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      admin: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+      },
+      active: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+      },
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: 'active',
+      },
+      // customerId: {
+      //   type: DataTypes.INTEGER,
+      //   allowNull: false,
+      // },
     },
-    slug: {
-      type: DataTypes.STRING,
-    },
-    description: {
-      type: DataTypes.TEXT,
-      defaultValue: 'Is set as default admin',
-    },
-    auto: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-    admin: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-    },
-    active: {
-      type: DataTypes.INTEGER,
-      defaultValue: 1,
-    },
-    status: {
-      type: DataTypes.STRING,
-      defaultValue: 'active',
-    },
-    // customerId: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    // },
-  }, {
-    hooks: {
-      beforeSave: attributes => {
-        attributes.set('slug', slugify(attributes.get('name')));
-        // attributes.set('name', utils.slugify('admin'));
+    {
+      hooks: {
+        beforeSave: attributes => {
+          attributes.set('slug', slugify(attributes.get('name')));
+          // attributes.set('name', utils.slugify('admin'));
+        },
       },
     },
-  });
+  );
 
   Role.associate = models => {
     Role.belongsTo(models.Customer, {
@@ -62,6 +66,9 @@ export default function (sequelize, DataTypes) {
       allowNull: false,
     });
     Role.hasMany(models.User, {
+      foreignKey: 'roleId',
+    });
+    Role.hasMany(models.ModuleAccess, {
       foreignKey: 'roleId',
     });
   };

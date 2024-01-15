@@ -28,7 +28,7 @@ export default function (sequelize, DataTypes) {
         type: DataTypes.TEXT,
       },
       sectionType: {
-        type: DataTypes.JSONB,
+        type: DataTypes.STRING,
         // custom field, system field
       },
       slug: {

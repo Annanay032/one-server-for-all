@@ -1,11 +1,5 @@
 export default function (sequelize, DataTypes) {
   const ModuleAccess = sequelize.define('ModuleAccess', {
-    userId: {
-      type: DataTypes.INTEGER,
-    },
-    roleId: {
-      type: DataTypes.INTEGER,
-    },
     isCustomModule: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
@@ -30,6 +24,18 @@ export default function (sequelize, DataTypes) {
     ModuleAccess.belongsTo(models.CustomModule, {
       foreignKey: {
         fieldName: 'customModuleId',
+      },
+    });
+
+    ModuleAccess.belongsTo(models.User, {
+      foreignKey: {
+        fieldName: 'userId',
+      },
+    });
+
+    ModuleAccess.belongsTo(models.Role, {
+      foreignKey: {
+        fieldName: 'roleId',
       },
     });
     // ModuleAccess.hasMany(models.Field, {

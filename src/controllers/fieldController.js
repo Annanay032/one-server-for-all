@@ -41,13 +41,16 @@ class FieldController extends BaseController {
   }
 
   bulkMarkInactiveById(fieldIds) {
-    return super.update({
-      active: 0,
-    }, {
-      where: {
-        id: fieldIds,
+    return super.update(
+      {
+        active: 0,
       },
-    });
+      {
+        where: {
+          id: fieldIds,
+        },
+      },
+    );
   }
 
   findAllByKeys(keys) {
@@ -77,18 +80,57 @@ class FieldController extends BaseController {
           [Op.contains]: validationType,
         },
       },
-      include: [{
-        model: db.Section,
-        where: {
-          active: 1,
-          delete: 0,
-          formId,
+      include: [
+        {
+          model: db.Section,
+          where: {
+            active: 1,
+            delete: 0,
+            formId,
+          },
+          attributes: ['id'],
         },
-        attributes: ['id'],
-      }],
-      attributes: ['id', 'validation', 'validationType', 'isOrgLevel', 'fieldKey', 'tableReference', 'label', 'labelSlug'],
+      ],
+      attributes: [
+        'id',
+        'validation',
+        'validationType',
+        'isOrgLevel',
+        'fieldKey',
+        'tableReference',
+        'label',
+        'labelSlug',
+      ],
     };
     return super.findAll(filter);
+  }
+
+  updateById(values, id) {
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
+    const options = {
+      where: {
+        id,
+        // customerId: this.customerId,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return this.model.update(values, options);
+  }
+
+  updateBySectionId(values, sectionId) {
+    // if (values.customerId) {
+    //   throw new Error('cappController - Invalid customer ID update');
+    // }
+    const options = {
+      where: {
+        sectionId,
+        // customerId: this.customerId,
+      },
+      // individualHooks: this.individualHooks,
+    };
+    return this.model.update(values, options);
   }
 }
 

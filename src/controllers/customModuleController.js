@@ -11,14 +11,16 @@ class CustomModuleController extends BaseController {
       where: {
         active: true,
       },
-      include: [{
-        model: db.User,
-        attributes: ['id', 'name'],
-      },
-      {
-        model: db.Section,
-        attributes: ['id', 'sectionName'],
-      }],
+      include: [
+        {
+          model: db.User,
+          attributes: ['id', 'name'],
+        },
+        {
+          model: db.Section,
+          attributes: ['id', 'sectionName'],
+        },
+      ],
     };
     // if (options.startswith) {
     //   filter.where.name = {
@@ -110,14 +112,8 @@ class CustomModuleController extends BaseController {
   findOneByIdForView(cmId, options = {}) {
     const modalAccessFilter = {
       active: true,
-      [Op.or]: [
-        {
-          roleId: +options.roleId,
-        },
-        {
-          userId: +options.userId,
-        },
-      ],
+      isCustomModule: true,
+      customModuleId: cmId,
     };
     const filter = {
       where: {
@@ -131,11 +127,14 @@ class CustomModuleController extends BaseController {
           },
           required: false,
           separate: true,
+          order: [['sno', 'ASC']],
           include: [
             {
               model: db.Field,
               required: false,
               separate: true,
+              order: [['sno', 'ASC']],
+
               where: {
                 active: true,
               },
@@ -144,9 +143,30 @@ class CustomModuleController extends BaseController {
         },
         {
           model: db.ModuleAccess,
-          where: modalAccessFilter,
           required: false,
           separate: true,
+          where: modalAccessFilter,
+          include: [
+            {
+              model: db.User,
+              where: {
+                active: 1,
+              },
+              required: false,
+              attributes: [['id', 'value'], ['name', 'label']],
+
+            },
+            {
+              model: db.Role,
+              where: {
+                active: 1,
+              },
+              required: false,
+              attributes: [['id', 'value'], ['name', 'label']],
+
+            },
+          ],
+          attributes: ['id'],
         },
       ],
     };

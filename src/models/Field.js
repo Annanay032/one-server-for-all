@@ -98,7 +98,11 @@ export default function (sequelize, DataTypes) {
     dependentFields: {
       type: DataTypes.JSONB,
       defaultValue: [],
-    }
+    },
+    visibleInListing: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   }, {
     hooks: {
       beforeSave: attributes => {
