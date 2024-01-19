@@ -87,9 +87,9 @@ export default function (sequelize, DataTypes) {
     helpText: {
       type: DataTypes.TEXT,
     },
-    size: {
+    fieldSize: {
       type: DataTypes.INTEGER,
-      default: 150,
+      default: 1,
     },
     wrapText: {
       type: DataTypes.INTEGER,

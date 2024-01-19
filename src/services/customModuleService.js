@@ -37,6 +37,81 @@ customModuleService.findOneByIdForView = async (cmId, options, auth) => {
   return customModule;
 };
 
+customModuleService.generateModuleDataMap = async cmData => {
+  const customModuleData = {
+    ...cmData.toJSON(),
+    listingColumns: [],
+    sectionOrderMap: {},
+    initialVisibleColumns: [],
+    sectionMap: {},
+  };
+  // listing
+  customModuleData.listingColumns = [{ name: 'ID', uid: 'id', sortable: true }];
+  customModuleData.Sections?.forEach(sec => {
+    customModuleData.sectionMap[sec.key] = { ...sec };
+    if (sec.sectionType === 'tableSection') {
+      if (!customModuleData.sectionOrderMap.tableSection) {
+        customModuleData.sectionOrderMap.tableSection = [];
+      }
+      customModuleData.sectionOrderMap.tableSection.push(sec.key);
+    } else if (sec.sectionType === 'nonTableSection') {
+      if (!customModuleData.sectionOrderMap.nonTableSection) {
+        customModuleData.sectionOrderMap.nonTableSection = [];
+      }
+      customModuleData.sectionOrderMap.nonTableSection.push(sec.key);
+    }
+    customModuleData.sectionMap[sec.key].fieldMap = {};
+    customModuleData.sectionMap[sec.key].fieldsOrder = [];
+    customModuleData.sectionMap[sec.key].Fields?.forEach(fd => {
+      if (fd.visibleInListing) {
+        const listingField = {
+          name: fd.fieldName.toUpperCase(),
+          uid: fd.fieldKey,
+          sortable: ['text', 'number'].includes(fd.fieldType),
+          searchable: true,
+        };
+        customModuleData.listingColumns.push(listingField);
+        if (customModuleData.initialVisibleColumns?.length < 6) {
+          customModuleData.initialVisibleColumns.push(fd.fieldKey);
+        }
+      }
+      if (!customModuleData.sectionMap[sec.key].fieldMap[fd.fieldKey]) {
+        customModuleData.sectionMap[sec.key].fieldMap[fd.fieldKey] = {};
+      }
+      customModuleData.sectionMap[sec.key].fieldMap[fd.fieldKey] = { ...fd, label: fd.fieldName, visible: 1 };
+      customModuleData.sectionMap[sec.key].fieldsOrder.push(fd.fieldKey);
+    });
+
+    delete customModuleData.sectionMap[sec.key].Fields;
+  });
+  delete customModuleData.Sections;
+  customModuleData.listingColumns.push(
+    {
+      name: 'CREATED BY',
+      uid: 'user',
+      sortable: true,
+      searchable: true,
+    },
+    { name: 'STATUS', uid: 'status', sortable: true },
+    { name: 'ACTIONS', uid: 'actions', enableIcons: true },
+  );
+
+  customModuleData.initialVisibleColumns.push('user', 'status', 'actions');
+  //
+
+  return customModuleData;
+};
+
+customModuleService.findOneBySlugForView = async (slug, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModuleSlug = await customModuleController.findOneBySlugForView(slug);
+  const customModule = await customModuleController.findOneByIdForView(
+    customModuleSlug.id,
+  );
+  const customModuleData = await customModuleService.generateModuleDataMap(customModule);
+  return customModuleData;
+};
+
 customModuleService.update = async (values, cmId, auth) => {
   console.log('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeevalues', values);
 
@@ -210,15 +285,9 @@ customModuleService.deleteById = async (cmId, auth) => {
   const fieldController = new FieldController(auth.customerId);
   const sectionController = new SectionController(auth.customerId);
 
-  customModuleController.updateById(
-    { delete: 1, active: false },
-    cmId,
-  );
+  customModuleController.updateById({ delete: 1, active: false }, cmId);
 
-  await moduleAccessController.updateByCMId(
-    { delete: 1, active: false },
-    cmId,
-  );
+  await moduleAccessController.updateByCMId({ delete: 1, active: false }, cmId);
 
   const sections = await sectionController.updateByCMId(
     { delete: 1, active: false },
@@ -228,10 +297,7 @@ customModuleService.deleteById = async (cmId, auth) => {
   // console.log('erfrrrrrrrrrr', sec)
 
   await mapSeries(sections, async (item, index) => {
-    await fieldController.updateBySectionId(
-      { delete: 1, active: false },
-      item,
-    );
+    await fieldController.updateBySectionId({ delete: 1, active: false }, item);
   });
 
   // await fieldController.updateBySectionId(

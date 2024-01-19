@@ -109,7 +109,7 @@ class CustomModuleController extends BaseController {
     return super.findAll(filter);
   }
 
-  findOneByIdForView(cmId, options = {}) {
+  findOneByIdForView(cmId) {
     const modalAccessFilter = {
       active: true,
       isCustomModule: true,
@@ -153,8 +153,10 @@ class CustomModuleController extends BaseController {
                 active: 1,
               },
               required: false,
-              attributes: [['id', 'value'], ['name', 'label']],
-
+              attributes: [
+                ['id', 'value'],
+                ['name', 'label'],
+              ],
             },
             {
               model: db.Role,
@@ -162,13 +164,25 @@ class CustomModuleController extends BaseController {
                 active: 1,
               },
               required: false,
-              attributes: [['id', 'value'], ['name', 'label']],
-
+              attributes: [
+                ['id', 'value'],
+                ['name', 'label'],
+              ],
             },
           ],
           attributes: ['id'],
         },
       ],
+    };
+    return super.findOne(filter);
+  }
+
+  findOneBySlugForView(slug) {
+    const filter = {
+      where: {
+        slug,
+      },
+      attributes: ['id', 'name'],
     };
     return super.findOne(filter);
   }

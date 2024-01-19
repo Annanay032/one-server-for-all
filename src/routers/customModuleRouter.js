@@ -27,6 +27,14 @@ router.get('/:cmId', (req, res, next) => {
     .catch(err => next(err));
 });
 
+router.get('/slug/:slugName', (req, res, next) => {
+  console.log('uytrew34232232222222222', req.params, req.body, req.query)
+  const { slugName } = req.params;
+  return customModuleService.findOneBySlugForView(slugName, req.appAuth)
+    .then(ret => responseHelper.success(res, ret))
+    .catch(err => next(err));
+});
+
 router.delete('/:cmId', (req, res, next) => {
   const { cmId } = req.params;
   return customModuleService.deleteById(cmId, req.appAuth)

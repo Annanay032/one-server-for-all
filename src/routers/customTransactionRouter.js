@@ -18,17 +18,17 @@ router.post('/', (req, res, next) => {
     .catch(err => next(err));
 });
 
-router.get('/:cmId', (req, res, next) => {
-  const { companyId } = req.params;
-  return customTransactionService.findOneByIdForView(companyId, req.appAuth)
+router.get('/:ctId', (req, res, next) => {
+  const { ctId } = req.params;
+  return customTransactionService.findOneByIdForView(ctId, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });
 
-router.post('/:cmId', (req, res, next) => {
-  const { companyId } = req.params;
+router.post('/:ctId', (req, res, next) => {
+  const { ctId } = req.params;
   const values = req.body;
-  return customTransactionService.update(values, companyId, req.appAuth)
+  return customTransactionService.update(values, ctId, req.appAuth)
     .then(ret => responseHelper.success(res, ret))
     .catch(err => next(err));
 });

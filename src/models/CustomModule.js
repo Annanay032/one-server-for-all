@@ -81,7 +81,7 @@ export default function (sequelize, DataTypes) {
     });
 
     CustomModule.hasMany(models.CustomTransaction, {
-      fieldName: 'CustomTransactionId',
+      foreignKey: 'customModuleId',
     });
   };
 

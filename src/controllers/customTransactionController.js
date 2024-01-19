@@ -3,89 +3,52 @@ import { db, Op } from '../models/index.js';
 
 class CustomTransactionController extends BaseController {
   constructor(customerId, transaction) {
-    super(db.Company, customerId, { individualHooks: true, transaction });
+    super(db.CustomTransaction, customerId, { individualHooks: true, transaction });
   }
 
-  findAllForListing(options) {
+  findAllForListing(customModuleId) {
     const filter = {
       where: {
-        active: 1,
+        active: true,
+        customModuleId,
       },
-    };
-    if (options.startswith) {
-      filter.where.name = {
-        [Op.ilike]: `%${options.startswith}%`,
-      };
-    }
-    if (options.query) {
-      filter.where.name = {
-        [Op.iLike]: `%${options.query}%`,
-      };
-    }
-    return super.findAndCountAll(filter);
-  }
-
-  findAllForSearch(options) {
-    const filter = {
-      where: {
-        active: 1,
+      include: [{
+        model: db.CustomTransactionFr,
+        where: {
+          sectionType: 'nonTableSection',
+        },
+        attributes:['fieldsResponses'],
       },
-      attributes: [['id', 'value'], ['companyName', 'label'], 'code'],
-    };
-    if (options.query) {
-      filter.where.name = {
-        [Op.iLike]: `%${options.query}%`,
-      };
-    }
-    return super.findAll(filter);
-  }
-
-  findAllWithCustomerId(customerId) {
-    const filter = {
-      where: {
-        customerId,
-      },
+      {
+        model: db.User,
+        attributes:['id', 'name'],
+      }],
+      attributes: ['id', 'customModuleId', 'active'],
     };
     return super.findAll(filter);
   }
 
-  findOneByReference(reference) {
+  findOneByIdForView(customTransactionId) {
     const filter = {
       where: {
-        reference,
+        active: true,
+        id: customTransactionId,
       },
-      // attributes: ['id', 'name'],
-    };
-    return super.findOne(filter);
-  }
-
-  findAllByReferences(references) {
-    const filter = {
-      where: {
-        reference: references,
+      include: [{
+        model: db.CustomTransactionFr,
+        // where: {
+        //   sectionType: 'nonTableSection',
+        // },
+        // attributes: ['fieldsResponses'],
       },
+      // {
+      //   model: db.User,
+      //   attributes: ['id', 'name'],
+      // }
+    ],
+      // attributes: ['id', 'customModuleId', 'active'],
     };
-    return super.findAll(filter);
-  }
-
-  findOneByCustomerId(customerId) {
-    const filter = {
-      where: {
-        customerId,
-      },
-      // attributes: ['id', 'name'],
-    };
-    return super.findOne(filter);
-  }
-
-  findOneByIdWithAttributes(companyId, attributes) {
-    const filter = {
-      where: {
-        id: companyId,
-      },
-      attributes,
-    };
-    return super.findOne(filter);
+    return this.model.findOne(filter);
   }
 
   findAllBySlugs(distintSlugs) {

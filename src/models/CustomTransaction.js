@@ -5,13 +5,16 @@ export default function (sequelize, DataTypes) {
       sno: {
         type: DataTypes.INTEGER,
       },
-      fieldsMap: {
+      sectionsMap: {
         type: DataTypes.JSONB,
       },
-      fieldsOrder: {
+      // fieldsOrder: {
+      //   type: DataTypes.JSONB,
+      // },
+      tableSectionRowOrder: {
         type: DataTypes.JSONB,
       },
-      fieldsResponses: {
+      sectionOrderMap: {
         type: DataTypes.JSONB,
       },
       active: {
@@ -28,16 +31,21 @@ export default function (sequelize, DataTypes) {
   CustomTransaction.associate = models => {
     CustomTransaction.belongsTo(models.CustomModule, {
       foreignKey: {
-        fieldName: 'CustomModuleId',
+        fieldName: 'customModuleId',
         allowNull: false,
       },
     });
-    // CustomTransaction.belongsTo(models.User, {
-    //   foreignKey: {
-    //     fieldName: 'userId',
-    //     allowNull: false,
-    //   },
-    // });
+
+    CustomTransaction.belongsTo(models.User, {
+      foreignKey: {
+        fieldName: 'userId',
+        allowNull: false,
+      },
+    });
+
+    CustomTransaction.hasMany(models.CustomTransactionFr, {
+      foreignKey: 'customTransactionId',
+    });
   };
 
   return CustomTransaction;

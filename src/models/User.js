@@ -75,6 +75,9 @@ export default function (sequelize, DataTypes) {
     User.hasMany(models.ModuleAccess, {
       foreignKey: 'userId',
     });
+    User.hasMany(models.CustomTransaction, {
+      foreignKey: 'userId',
+    });
   };
 
   // User.sync();
