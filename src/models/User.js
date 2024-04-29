@@ -78,6 +78,9 @@ export default function (sequelize, DataTypes) {
     User.hasMany(models.CustomTransaction, {
       foreignKey: 'userId',
     });
+    User.hasMany(models.InventoryItem, {
+      foreignKey: 'userId',
+    });
   };
 
   // User.sync();
