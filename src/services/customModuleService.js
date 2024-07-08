@@ -28,6 +28,46 @@ customModuleService.findAllForListing = async (options, auth) => {
   };
 };
 
+customModuleService.findAllByOptions = (auth, params) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  return customModuleController.findAllForOptions(auth.customerId, params);
+};
+
+customModuleService.findAllCMFieldsByOptions = async (cmId, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModule = await customModuleController.findOneByIdForFields(
+    cmId,
+  );
+  const cmData = [];
+  customModule.toJSON().Sections.forEach(sec => {
+    cmData.push(...sec.Fields);
+  });
+
+  return cmData;
+};
+
+customModuleService.findAllCMFieldsByOptionsForMappings = async (params, auth) => {
+  const { convertToModuleId, moduleId } = params;
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModule = await customModuleController.findOneByIdForFields(
+    moduleId,
+  );
+  const convertToCustomModule = await customModuleController.findOneByIdForFields(
+    convertToModuleId,
+  );
+  const cmData = [];
+  customModule.toJSON().Sections.forEach(sec => {
+    cmData.push(...sec.Fields);
+  });
+
+  const cmDataTo = [];
+  convertToCustomModule.toJSON().Sections.forEach(sec => {
+    cmDataTo.push(...sec.Fields);
+  });
+  const finalData = { ModuleFields: cmData, ConvertToModuleFields: cmDataTo};
+  return finalData;
+};
+
 customModuleService.findOneByIdForView = async (cmId, options, auth) => {
   const customModuleController = new CustomModuleController(auth.customerId);
   const customModule = await customModuleController.findOneByIdForView(

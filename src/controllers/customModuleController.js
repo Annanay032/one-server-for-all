@@ -35,6 +35,22 @@ class CustomModuleController extends BaseController {
     return super.findAll(filter);
   }
 
+  findAllForOptions(customerId, params) {
+    const filter = {
+      where: {
+        active: true,
+        customerId,
+      },
+      attributes: [['id', 'value'], ['name', 'label']],
+    };
+    if (params.excludeId) {
+      filter.where.id = {
+        [Op.ne]: params.excludeId, // Exclude the specific id from params
+      };
+    }
+    return super.findAll(filter);
+  }
+
   findAllForSearch(options) {
     const filter = {
       where: {
@@ -173,6 +189,40 @@ class CustomModuleController extends BaseController {
           attributes: ['id'],
         },
       ],
+    };
+    return super.findOne(filter);
+  }
+
+  findOneByIdForFields(cmId) {
+    const filter = {
+      where: {
+        id: cmId,
+      },
+      include: [
+        {
+          model: db.Section,
+          where: {
+            active: true,
+          },
+          required: false,
+          separate: true,
+          attributes: ['id'],
+          order: [['sno', 'ASC']],
+          include: [
+            {
+              model: db.Field,
+              required: false,
+              separate: true,
+              order: [['sno', 'ASC']],
+              attributes: [['id', 'value'], ['fieldName', 'label'], 'fieldKey', 'isRequired'],
+              where: {
+                active: true,
+              },
+            },
+          ],
+        },
+      ],
+      attributes: ['id'],
     };
     return super.findOne(filter);
   }
