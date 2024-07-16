@@ -4,6 +4,8 @@ import times from 'lodash/times.js';
 import _get from 'lodash/get.js';
 import moment from 'moment';
 import dateFormat from 'dateformat';
+import { customAlphabet } from 'nanoid';
+
 // import reportService from '../capp/services/reportService';
 // import supplierService from '../capp/services/supplierService';
 // import addressService from '../capp/services/addressService';
@@ -2846,6 +2848,9 @@ utils.applyExcludeSelectedAndFindApprovals = atis => {
   }
   return approvals;
 };
+
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+utils.useCustomNanoId = customAlphabet(alphabet, 12);
 
 utils.deepCopy = data => JSON.parse(JSON.stringify(data));
 

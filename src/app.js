@@ -12,6 +12,7 @@ import notificationRouter from './routers/notificationRouter.js';
 import roleRouter from './routers/roleRouter.js';
 import companyRouter from './routers/companyRouter.js';
 import addressRouter from './routers/addressRouter.js';
+import approvalTemplateRouter from './routers/approvalTemplateRouter.js';
 import customModuleRouter from './routers/customModuleRouter.js';
 import customTransactionRouter from './routers/customTransactionRouter.js';
 import responseHelper from './helpers/response.js';
@@ -19,10 +20,12 @@ import { RouteNotFoundError } from './helpers/customError.js';
 
 const app = express();
 // const PORT = 8080;
-app.use(cors({
-  origin: 'http://localhost:3000', // Replace with the actual origin of your frontend
-  credentials: true, // Allow credentials (e.g., cookies)
-}));
+app.use(
+  cors({
+    origin: 'http://localhost:3000', // Replace with the actual origin of your frontend
+    credentials: true, // Allow credentials (e.g., cookies)
+  }),
+);
 
 app.use(morgan('combined', { stream: logger.stream }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
@@ -34,12 +37,18 @@ app.all('*', (req, res, next) => {
   console.log('Before processing - ', req.url, req.method);
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
   res.header('Access-Control-Allow-Credentials', 'true'); // Allow credentials
   res.header('Strict-Transport-Security', 'maxAge=100000');
   res.header('X-Frame-Options', 'DENY');
   res.header('Content-Security-Policy', "frame-ancestors 'none'");
-  res.header('Access-Control-Allow-Headers', 'Cookies, cookies, x-access-token, Origin, Content-Type, Accept, authUser');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Cookies, cookies, x-access-token, Origin, Content-Type, Accept, authUser',
+  );
   if (req.method === 'OPTIONS') {
     return responseHelper.optionsSuccess(res);
   }
@@ -56,6 +65,7 @@ app.use('/addresses', addressRouter);
 app.use('/company', companyRouter);
 app.use('/custom-module', customModuleRouter);
 app.use('/custom-transaction', customTransactionRouter);
+app.use('/approval-templates', approvalTemplateRouter);
 
 app.use((req, res, next) => {
   next(new RouteNotFoundError());
