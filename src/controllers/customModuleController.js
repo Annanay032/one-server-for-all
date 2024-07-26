@@ -227,6 +227,28 @@ class CustomModuleController extends BaseController {
     return super.findOne(filter);
   }
 
+  findOneByIdForSections(cmId) {
+    const filter = {
+      where: {
+        id: cmId,
+      },
+      include: [
+        {
+          model: db.Section,
+          where: {
+            active: true,
+          },
+          required: false,
+          separate: true,
+          attributes: [['id', 'value'], ['sectionName', 'label'], 'sectionType'],
+          order: [['sno', 'ASC']],
+        },
+      ],
+      attributes: ['id'],
+    };
+    return super.findOne(filter);
+  }
+
   findOneBySlugForView(slug) {
     const filter = {
       where: {

@@ -38,22 +38,22 @@ roleService.findAllByOptions = auth => {
 };
 
 roleService.create = async (values, auth) => {
-  const allowedValuesForListingTypes = ['all', 'dimensions', 'collaborators'];
+  // const allowedValuesForListingTypes = ['all', 'dimensions', 'collaborators'];
   if (!values.name) {
     throw new ValidationError('Name is mandatory');
   }
-  if(!allowedValuesForListingTypes.includes(values.requisitionListingType)) {
-    throw new ValidationError('Invalid listing type for Requisition');
-  }
-  if(!allowedValuesForListingTypes.includes(values.purchaseOrderListingType)) {
-    throw new ValidationError('Invalid listing type for Purchase Order');
-  }
-  if(!allowedValuesForListingTypes.includes(values.invoiceListingType)) {
-    throw new ValidationError('Invalid listing type for Invoice');
-  }
-  if(!allowedValuesForListingTypes.includes(values.stockInwardListingType)) {
-    throw new ValidationError('Invalid listing type for Stock Inward');
-  }
+  // if(!allowedValuesForListingTypes.includes(values.requisitionListingType)) {
+  //   throw new ValidationError('Invalid listing type for Requisition');
+  // }
+  // if(!allowedValuesForListingTypes.includes(values.purchaseOrderListingType)) {
+  //   throw new ValidationError('Invalid listing type for Purchase Order');
+  // }
+  // if(!allowedValuesForListingTypes.includes(values.invoiceListingType)) {
+  //   throw new ValidationError('Invalid listing type for Invoice');
+  // }
+  // if(!allowedValuesForListingTypes.includes(values.stockInwardListingType)) {
+  //   throw new ValidationError('Invalid listing type for Stock Inward');
+  // }
 
   const roleController = new RoleController(auth.customerId);
   const roleCheck = await roleController.findOneBySlug(utils.slugify(values.name));

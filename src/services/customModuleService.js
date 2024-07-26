@@ -46,6 +46,19 @@ customModuleService.findAllCMFieldsByOptions = async (cmId, auth) => {
   return cmData;
 };
 
+customModuleService.findAllCMSectionsByOptions = async (cmId, auth) => {
+  const customModuleController = new CustomModuleController(auth.customerId);
+  const customModule = await customModuleController.findOneByIdForSections(
+    cmId,
+  );
+  const cmData = customModule.toJSON().Sections.map(sec => ({
+    ...sec,
+    label: `${sec.label} - ${sec.sectionType}`,
+  }));
+
+  return cmData;
+};
+
 customModuleService.findAllCMFieldsByOptionsForMappings = async (params, auth) => {
   const { convertToModuleId, moduleId } = params;
   const customModuleController = new CustomModuleController(auth.customerId);

@@ -30,6 +30,14 @@ router.get('/fields/:cmId', (req, res, next) => {
     .catch(err => next(err));
 });
 
+router.get('/sections/:cmId', (req, res, next) => {
+  const { cmId } = req.params;
+  return customModuleService
+    .findAllCMSectionsByOptions(cmId, req.appAuth)
+    .then(ret => responseHelper.success(res, ret, ret.meta))
+    .catch(err => next(err));
+});
+
 router.post('/', (req, res, next) => {
   const values = req.body;
   return customModuleService
